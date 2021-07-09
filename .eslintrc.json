@@ -1,0 +1,10 @@
+{
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "globals": {
+    "__PATH_PREFIX__": true
+  },
+  "extends": "react-app"
+}

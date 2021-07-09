@@ -1,0 +1,22 @@
+{
+  "name": "gatsby-plugin-wrap-pages",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "author": "Tobias Høegh",
+  "scripts": {
+    "test": "jest"
+  },
+  "peerDependencies": {
+    "gatsby": "*",
+    "react": "*",
+    "react-dom": "*"
+  },
+  "dependencies": {
+    "chokidar": "*",
+    "gatsby-core-utils": "*"
+  },
+  "devDependencies": {
+    "jest": "^27.0.6"
+  }
+}

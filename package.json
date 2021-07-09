@@ -1,0 +1,22 @@
+{
+  "name": "wrap-pages-monorepo",
+  "private": true,
+  "workspaces": [
+    "example",
+    "gatsby-plugin-wrap-pages"
+  ],
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "Tobias Høegh",
+  "scripts": {
+    "start": "yarn workspace example gatsby develop --port=8090",
+    "build": "yarn workspace example gatsby build",
+    "serve": "yarn workspace example gatsby serve --port=9090",
+    "clean": "yarn workspace example gatsby clean",
+    "test": "yarn workspace gatsby-plugin-wrap-pages test"
+  },
+  "devDependencies": {
+    "eslint": "^7.30.0",
+    "eslint-config-react-app": "^6.0.0"
+  }
+}
