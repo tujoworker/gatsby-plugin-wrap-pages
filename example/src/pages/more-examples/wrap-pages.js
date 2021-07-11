@@ -4,7 +4,7 @@ const sharedStyles = {
   padding: '1rem',
 }
 
-export default function wrapPages({ element }) {
+export function wrapPagesDeep({ element }) {
   return (
     <div style={{ ...sharedStyles, backgroundColor: 'LightSkyBlue' }}>
       {element}

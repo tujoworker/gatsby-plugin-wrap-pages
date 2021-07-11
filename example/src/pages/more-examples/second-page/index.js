@@ -4,8 +4,10 @@ import { Link } from 'gatsby'
 export default function Page() {
   return (
     <>
-      <p>This page is wrapped with a second wrapper.</p>
-      <Link to="/">Restart this little toure</Link>
+      <p>
+        This page is wrapped with <b>two</b> wrappers.
+      </p>
+      <Link to="/more-examples/second-page/third-page">One more?</Link>
     </>
   )
 }

@@ -5,18 +5,30 @@
   "license": "MIT",
   "author": "Tobias Høegh",
   "scripts": {
-    "test": "jest"
+    "test": "yarn workspace integration-tests test",
+    "test:watch": "yarn workspace integration-tests test --watch",
+    "lint": "eslint --ext .js --ignore-path ../.gitignore ."
   },
   "peerDependencies": {
     "gatsby": "*",
     "react": "*",
     "react-dom": "*"
   },
-  "dependencies": {
-    "chokidar": "*",
-    "gatsby-core-utils": "*"
-  },
   "devDependencies": {
-    "jest": "^27.0.6"
+    "@testing-library/react": "^12.0.0",
+    "babel-eslint": "^10.1.0",
+    "chokidar": "*",
+    "eslint": "^7.30.0",
+    "eslint-config-react-app": "^6.0.0",
+    "eslint-plugin-flowtype": "^5.8.0",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-jest": "^24.3.6",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "fs-extra": "*",
+    "gatsby-core-utils": "*",
+    "jest": "^27.0.6",
+    "signal-exit": "*"
   }
 }

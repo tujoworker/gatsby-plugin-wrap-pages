@@ -1,0 +1,67 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`wrapPages on second last page should match snapshot 1`] = `
+<body>
+  <div>
+    <div
+      data-testid="wrapPagesDeep-main"
+    >
+      <header
+        role="header"
+      >
+        header
+      </header>
+      <main
+        role="main"
+      >
+        <div
+          data-testid="wrapPages-first"
+        >
+          <div
+            data-testid="wrapPagesDeep-second"
+          >
+            <div
+              data-testid="content"
+            >
+              Page Content
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`wrapPagesDeep should match snapshot 1`] = `
+<body>
+  <div>
+    <div
+      data-testid="wrapPagesDeep-main"
+    >
+      <header
+        role="header"
+      >
+        header
+      </header>
+      <main
+        role="main"
+      >
+        <div
+          data-testid="wrapPagesDeep-first"
+        >
+          <div
+            data-testid="wrapPagesDeep-second"
+          >
+            <div
+              data-testid="content"
+            >
+              Page Content
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+`;

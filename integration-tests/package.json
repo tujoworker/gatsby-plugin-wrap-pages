@@ -1,0 +1,26 @@
+{
+  "name": "integration-tests",
+  "version": "0.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "author": "Tobias Høegh",
+  "scripts": {
+    "test": "jest"
+  },
+  "dependencies": {
+    "gatsby-plugin-wrap-pages": "*"
+  },
+  "devDependencies": {
+    "@babel/runtime": "*",
+    "@testing-library/react": "^12.0.0",
+    "babel-preset-gatsby": "*",
+    "chokidar": "*",
+    "fs-extra": "*",
+    "gatsby": "*",
+    "gatsby-core-utils": "*",
+    "jest": "^27.0.6",
+    "joi": "*",
+    "react": "*",
+    "signal-exit": "*"
+  }
+}

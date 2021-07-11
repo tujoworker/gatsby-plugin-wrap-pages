@@ -6,7 +6,7 @@
   "license": "MIT",
   "author": "Tobias Høegh",
   "dependencies": {
-    "gatsby": "^3.9.0",
+    "gatsby": "^3.9.1",
     "gatsby-plugin-wrap-pages": "*",
     "react": "^17",
     "react-dom": "^17"
