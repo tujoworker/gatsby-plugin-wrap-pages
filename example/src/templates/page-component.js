@@ -22,7 +22,7 @@ export default function Page() {
         {`
 // It uses this config
 context: {
-  wrapPageWith: '/more-examples/second-page/third-page'
+  wrapPageWith: './src/pages/more-examples/second-page/third-page'
 }
 `}
       </pre>
