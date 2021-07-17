@@ -30,5 +30,8 @@
     "gatsby-core-utils": "*",
     "jest": "^27.0.6",
     "signal-exit": "*"
+  },
+  "volta": {
+    "extends": "../package.json"
   }
 }

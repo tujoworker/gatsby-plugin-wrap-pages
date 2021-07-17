@@ -1,6 +1,6 @@
 {
   "name": "wrap-pages-monorepo",
-  "description": "With this plugin you can add wrappers inside the pages directory",
+  "description": "With this Gatsby Plugin you can wrap your pages declaratively",
   "keywords": [
     "gatsby",
     "gatsby-plugin",
@@ -10,6 +10,13 @@
   ],
   "license": "MIT",
   "author": "Tobias Høegh",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tujoworker/gatsby-plugin-wrap-pages.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tujoworker/gatsby-plugin-wrap-pages/issues"
+  },
   "workspaces": [
     "example",
     "integration-tests",
@@ -25,5 +32,11 @@
     "test": "yarn workspace integration-tests test",
     "test:watch": "yarn workspace integration-tests test --watch",
     "lint": "yarn workspace gatsby-plugin-wrap-pages lint"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "volta": {
+    "node": "16.1.0"
   }
 }
