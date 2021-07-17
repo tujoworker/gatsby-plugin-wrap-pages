@@ -12,12 +12,12 @@ my-project/
 │       └── your-path/
 │           ├── wrap-pages.js // ← wrapPages()
 │           ├── index.js
-│           ├── page-foo.js
+│           ├── foo.js
 │           ├── …
 │           └── more-nested-paths/
 │               ├── wrap-pages.js // ← wrapPages()
 │               ├── index.js
-│               ├── page-bar.js
+│               ├── bar.js
 │               └── …
 ├── package.json
 └── gatsby-config.json
