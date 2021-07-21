@@ -1,28 +1,13 @@
 {
   "name": "wrap-pages-monorepo",
-  "description": "With this Gatsby Plugin you can wrap your pages declaratively",
-  "keywords": [
-    "gatsby",
-    "gatsby-plugin",
-    "layout",
-    "provider",
-    "wrapper"
-  ],
-  "license": "MIT",
-  "author": "Tobias Høegh",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/tujoworker/gatsby-plugin-wrap-pages.git"
-  },
-  "bugs": {
-    "url": "https://github.com/tujoworker/gatsby-plugin-wrap-pages/issues"
-  },
   "workspaces": [
     "example",
     "integration-tests",
     "gatsby-plugin-wrap-pages"
   ],
   "private": true,
+  "license": "MIT",
+  "author": "Tobias Høegh",
   "version": "0.0.0",
   "scripts": {
     "start": "yarn workspace example gatsby develop --port=8090",
@@ -31,7 +16,8 @@
     "clean": "yarn workspace example gatsby clean",
     "test": "yarn workspace integration-tests test",
     "test:watch": "yarn workspace integration-tests test --watch",
-    "lint": "yarn workspace gatsby-plugin-wrap-pages lint"
+    "lint": "yarn workspace gatsby-plugin-wrap-pages lint",
+    "publish": "yarn workspace gatsby-plugin-wrap-pages publish"
   },
   "publishConfig": {
     "access": "public"
