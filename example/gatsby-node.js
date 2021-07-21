@@ -6,7 +6,7 @@ exports.createPages = async ({ actions }) => {
     path: '/more-examples/second-page/third-page',
     component: systemPath.resolve('./src/templates/page-component.js'),
     context: {
-      wrapPageWith: './src/pages/more-examples/second-page/third-page',
+      wrapPageWith: './src/pages/more-examples/second-page/third-page/',
     },
   })
 }

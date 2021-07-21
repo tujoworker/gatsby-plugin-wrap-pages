@@ -1,8 +1,6 @@
 # Gatsby Plugin for wrapping pages
 
-With this plugin you can add wrappers inside the pages directory. It will wrap pages within certain directories.
-
-Why? Everything is possible with vanilla Gatsby – what this Plugin offers, is just a different, yet declarative way of wrapping your pages.
+With this plugin you can add (nested) wrappers inside the pages directory. It will give you declaratively control of what pages you wrap with either HTML elements or React Providers.
 
 ```js
 my-project/
@@ -23,46 +21,46 @@ my-project/
 └── gatsby-config.json
 ```
 
+Why? Everything is possible with vanilla Gatsby – what this Plugin offers, is a different, yet declarative way of wrapping your pages.
+
 It supports:
 
 - TypeScript
+- SSR (SSG) and client-side rendering with the same wrapper
 - Wrap your pages with HTML Elements, React Components or Providers
 - Wrap pages in current directory
 - Wrap pages deep (nested)
 - Nested wrappers
 - Programmatically created pages
-- SSR (SSG) and client-side rendering with the same wrapper
 - Customize the name of the wrapper file
 
 ## How to use
 
-Inside `/src/pages/your-path` or `/src/pages/your-path/more-nested-paths` you add wrapper files named:
-
-- `wrap-pages.js` (or `.tsx`).
+Create files called `wrap-pages.js` (or `.tsx`) inside `/src/pages/.../your-path` with a named export function. That's it.
 
 ### Wrap pages at the current scope
 
-All your pages in that specific directory will be wrapped with `<main>[current page]</main>`.
-
-- Add a wrapper function called `wrapPages` like so:
+- Add a wrapper function named `wrapPages`:
 
 ```jsx
 export function wrapPages({ element }) {
-  return <main>{element}</main>
+  return <div>{element}</div>
 }
 ```
 
+Pages in that specific directory will be wrapped with `<div>[current page]</div>`.
+
 ### Wrap nested pages
 
-All your pages, including the ones in nested directories, will be wrapped in `<YourProvider>`.
-
-- Add a function called `wrapPagesDeep`:
+- Add a function named `wrapPagesDeep`:
 
 ```jsx
 export function wrapPagesDeep({ element }) {
   return <YourProvider>{element}</YourProvider>
 }
 ```
+
+All your pages, including the ones in nested directories, will be wrapped in `<YourProvider>`.
 
 **NB:** It will also be used for the current directory scope, if `wrapPages` is not given.
 
@@ -88,7 +86,7 @@ npm install gatsby-plugin-wrap-pages
 yarn add gatsby-plugin-wrap-pages
 ```
 
-... and add it to your `gatsby-config.js` file:
+… and add it to your `gatsby-config.js` file:
 
 ```diff
 exports.plugins = [
@@ -120,7 +118,7 @@ createPage({
   path: '/page-path',
   component: systemPath.resolve('./src/templates/your-page-component.js'),
   context: {
-+    wrapPageWith: '/src/pages/where-my/wrapper-is'
++    wrapPageWith: './src/pages/where-my/wrapper-is/'
   },
 })
 ```
@@ -129,7 +127,7 @@ createPage({
 
 ### In development mode
 
-- When adding or deleting a `wrap-pages.js` file, you may see a "file did not exists" error masse for a second. It should normally resolve. Try a hard refresh if not. In worst case, you may have to restart the development server. This also can happen when adding or deleting pages.
+- When adding or deleting a `wrap-pages.js` file, you may see a "file did not exists" error masse for a second. It should normally resolve. Try a hard refresh – if not. In worst case, you may have to restart the development server. This also can happen when adding or deleting pages.
 - On the initial first save to refresh, you may have to "save" twice to see force fast refresh to actually show the changes.
 
 ## How it works
