@@ -30,7 +30,10 @@ export const wrapPageElement = (params) => {
               }
 
               if (scope?.[name]) {
-                params.element = scope[name](params)
+                const result = scope[name](params)
+                if (result) {
+                  params.element = result
+                }
               }
             }
           }

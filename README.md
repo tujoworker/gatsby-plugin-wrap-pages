@@ -36,7 +36,9 @@ It supports:
 
 ## How to use
 
-Create files called `wrap-pages.js` (or `.tsx`) inside `/src/pages/.../your-path` with a named export function. That's it.
+Create a file called `wrap-pages.js` (or `.tsx`) inside `/src/pages/...somewhere` with a named export function. That's it.
+
+The parameters of that function are the same as Gatsby's API [`wrapPageElement`](https://www.gatsbyjs.com/docs/reference/config-files/gatsby-browser/#wrapPageElement), including the `element`, which we now can return – but modified.
 
 ### Wrap pages at the current scope
 
@@ -64,7 +66,7 @@ All your pages, including the ones in nested directories, will be wrapped in `<Y
 
 **NB:** It will also be used for the current directory scope, if `wrapPages` is not given.
 
-... and yes, you can do both:
+... and yes, you can have both:
 
 ```jsx
 // wraps pages in the current scope
@@ -76,6 +78,23 @@ export function wrapPages({ element }) {
 export function wrapPagesDeep({ element }) {
   return <Layout-B>{element}</Layout-B>
 }
+```
+
+### Nested wrappers
+
+You can have as many nested wrappers as you like:
+
+```js
+my-project/
+├── src/
+│   └── pages/
+│       ├── wrap-pages.js // ← One
+│       └── directory/
+│           ├── wrap-pages.js // ← Two
+│           ├── …
+│           └── directory/
+│               ├── wrap-pages.js // ← Three
+│               └── …
 ```
 
 ## Install
@@ -123,9 +142,25 @@ createPage({
 })
 ```
 
-## Known issues
+## FAQ
 
-### In development mode
+### About performance and size
+
+_Does it negatively impact the performance of my production build?_
+
+No. It should not have an impact negatively compared to other solutions done differently. The technique relies on function calls only.
+
+_Does it increase the size of my production build?_
+
+Not really. Every page gets assigned one or more hashes, but this should not really make your production build significantly larger.
+
+_Does it negatively interfere with Webpack tree shaking?_
+
+Not really. All the production code from the wrappers will be a part of the `app-[hash].js` bundle, because this code gets shared with several pages.
+
+If you use a large amount of JavaScript on only one page, you should put this code inside the page it belongs to. Webpack will then create a dedicated bundle for that page only.
+
+### Known issues in development mode
 
 - When adding or deleting a `wrap-pages.js` file, you may see a "file did not exists" error masse for a second. It should normally resolve. Try a hard refresh – if not. In worst case, you may have to restart the development server. This also can happen when adding or deleting pages.
 - On the initial first save to refresh, you may have to "save" twice to see force fast refresh to actually show the changes.
