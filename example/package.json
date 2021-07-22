@@ -8,7 +8,11 @@
   "dependencies": {
     "gatsby": "^3.10.0",
     "gatsby-plugin-wrap-pages": "*",
+    "moment": "^2.29.1",
     "react": "^17",
     "react-dom": "^17"
+  },
+  "devDependencies": {
+    "gatsby-plugin-webpack-bundle-analyser-v2": "^1.1.24"
   }
 }

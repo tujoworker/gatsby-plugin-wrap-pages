@@ -19,7 +19,30 @@ exports.pluginOptionsSchema = ({ Joi }) => {
   })
 }
 
-exports.onCreateWebpackConfig = ({ actions, plugins }) => {
+exports.onCreateWebpackConfig = ({ actions, plugins, stage }) => {
+  const extendConfig = {}
+
+  if (process.env.NODE_ENV === 'production' && stage === 'build-javascript') {
+    extendConfig.optimization = {
+      splitChunks: {
+        cacheGroups: {
+          wrappers: {
+            test(module) {
+              const id = module.identifier()
+              return (
+                new RegExp(`wrap-pages\..{2,3}$`).test(id) &&
+                id.includes(globalThis.directoryRoot)
+              )
+            },
+            name: 'wrappers',
+            priority: 50,
+            enforce: true,
+          },
+        },
+      },
+    }
+  }
+
   const cacheFilePath = systemPath.resolve(
     globalThis.directoryRoot,
     '.cache/wpe-scopes.js'
@@ -30,6 +53,7 @@ exports.onCreateWebpackConfig = ({ actions, plugins }) => {
         WDE_CACHE_PATH: JSON.stringify(cacheFilePath),
       }),
     ],
+    ...extendConfig,
   })
 }
 
