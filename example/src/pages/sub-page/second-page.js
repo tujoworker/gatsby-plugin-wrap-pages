@@ -5,7 +5,7 @@ export default function Page() {
   return (
     <>
       <p>This page is also wrapped.</p>
-      <Link to="/sub-page/sub/some-id-123">
+      <Link to="/sub-page/nested-routes">
         Visit a nested (deep) wrapped page
       </Link>
     </>

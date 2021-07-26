@@ -8,7 +8,7 @@ export default function Page() {
         This page is wrapped with <b>three</b> wrappers.
       </p>
       <p>
-        <b>NB:</b> This page is created{' '}
+        <b>NB:</b> Also, this page is created{' '}
         <a
           target="_blank"
           rel="noreferrer"
