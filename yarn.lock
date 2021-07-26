@@ -1719,6 +1719,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@eslint/eslintrc@npm:^0.4.3":
+  version: 0.4.3
+  resolution: "@eslint/eslintrc@npm:0.4.3"
+  dependencies:
+    ajv: ^6.12.4
+    debug: ^4.1.1
+    espree: ^7.3.0
+    globals: ^13.9.0
+    ignore: ^4.0.6
+    import-fresh: ^3.2.1
+    js-yaml: ^3.13.1
+    minimatch: ^3.0.4
+    strip-json-comments: ^3.1.1
+  checksum: 03a7704150b868c318aab6a94d87a33d30dc2ec579d27374575014f06237ba1370ae11178db772f985ef680d469dc237e7b16a1c5d8edaaeb8c3733e7a95a6d3
+  languageName: node
+  linkType: hard
+
 "@gatsbyjs/reach-router@npm:^1.3.6":
   version: 1.3.6
   resolution: "@gatsbyjs/reach-router@npm:1.3.6"
@@ -4673,7 +4690,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chokidar@npm:*, chokidar@npm:^3.4.2, chokidar@npm:^3.5.1":
+"chokidar@npm:*, chokidar@npm:^3.4.2, chokidar@npm:^3.5.1, chokidar@npm:^3.5.2":
   version: 3.5.2
   resolution: "chokidar@npm:3.5.2"
   dependencies:
@@ -6452,7 +6469,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-flowtype@npm:^5.3.1, eslint-plugin-flowtype@npm:^5.8.0":
+"eslint-plugin-flowtype@npm:^5.3.1":
   version: 5.8.0
   resolution: "eslint-plugin-flowtype@npm:5.8.0"
   dependencies:
@@ -6461,6 +6478,18 @@ __metadata:
   peerDependencies:
     eslint: ^7.1.0
   checksum: 0ae97f110b441eda8cd88b86331d7b3936447f33f7a586f8b9739e11fd2ba69fbc8aa6939ce5b083a455af8b1aaf629483ed50c41caf48de2049c2916ebca95a
+  languageName: node
+  linkType: hard
+
+"eslint-plugin-flowtype@npm:^5.8.1":
+  version: 5.8.1
+  resolution: "eslint-plugin-flowtype@npm:5.8.1"
+  dependencies:
+    lodash: ^4.17.15
+    string-natural-compare: ^3.0.1
+  peerDependencies:
+    eslint: ^7.1.0
+  checksum: bf09dff79c605d9a50f976288ebdb7ce076a03f7cf73b6614b1e272083d9440d7951abb56870533887c96ef42fb0fa6ddf70ec93d33d628ab8e4ef365b7859be
   languageName: node
   linkType: hard
 
@@ -6503,9 +6532,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jest@npm:^24.3.6":
-  version: 24.3.6
-  resolution: "eslint-plugin-jest@npm:24.3.6"
+"eslint-plugin-jest@npm:^24.4.0":
+  version: 24.4.0
+  resolution: "eslint-plugin-jest@npm:24.4.0"
   dependencies:
     "@typescript-eslint/experimental-utils": ^4.0.1
   peerDependencies:
@@ -6514,7 +6543,7 @@ __metadata:
   peerDependenciesMeta:
     "@typescript-eslint/eslint-plugin":
       optional: true
-  checksum: 233e6055b167a58ba2e58cf60dc9ce8a4b065d859abe551cf0029d3d6694aaa4a0cfd3b489dfa7442fffb5f40fc7bc0dc322068dd652d08534d1f5c17c7721a8
+  checksum: ffa3f019420e6263db6d1236fda6fd2650cea89e84bd975bd56813aa72e46f997d5350c3d08e1608f3049854e9ff651028b692356b1615cb7bd1862f71ed0f88
   languageName: node
   linkType: hard
 
@@ -6631,7 +6660,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^7.20.0, eslint@npm:^7.30.0":
+"eslint@npm:^7.20.0":
   version: 7.30.0
   resolution: "eslint@npm:7.30.0"
   dependencies:
@@ -6678,6 +6707,56 @@ __metadata:
   bin:
     eslint: bin/eslint.js
   checksum: 872f90844b164dd61ec1bb949d2e33e7fbd189e0652fabe2cbbd0bdce1e4cd7ed08e72fa213795a453ae39fe24460771800608e765febb9e778deb28b9db3cc1
+  languageName: node
+  linkType: hard
+
+"eslint@npm:^7.31.0":
+  version: 7.31.0
+  resolution: "eslint@npm:7.31.0"
+  dependencies:
+    "@babel/code-frame": 7.12.11
+    "@eslint/eslintrc": ^0.4.3
+    "@humanwhocodes/config-array": ^0.5.0
+    ajv: ^6.10.0
+    chalk: ^4.0.0
+    cross-spawn: ^7.0.2
+    debug: ^4.0.1
+    doctrine: ^3.0.0
+    enquirer: ^2.3.5
+    escape-string-regexp: ^4.0.0
+    eslint-scope: ^5.1.1
+    eslint-utils: ^2.1.0
+    eslint-visitor-keys: ^2.0.0
+    espree: ^7.3.1
+    esquery: ^1.4.0
+    esutils: ^2.0.2
+    fast-deep-equal: ^3.1.3
+    file-entry-cache: ^6.0.1
+    functional-red-black-tree: ^1.0.1
+    glob-parent: ^5.1.2
+    globals: ^13.6.0
+    ignore: ^4.0.6
+    import-fresh: ^3.0.0
+    imurmurhash: ^0.1.4
+    is-glob: ^4.0.0
+    js-yaml: ^3.13.1
+    json-stable-stringify-without-jsonify: ^1.0.1
+    levn: ^0.4.1
+    lodash.merge: ^4.6.2
+    minimatch: ^3.0.4
+    natural-compare: ^1.4.0
+    optionator: ^0.9.1
+    progress: ^2.0.0
+    regexpp: ^3.1.0
+    semver: ^7.2.1
+    strip-ansi: ^6.0.0
+    strip-json-comments: ^3.1.0
+    table: ^6.0.9
+    text-table: ^0.2.0
+    v8-compile-cache: ^2.0.3
+  bin:
+    eslint: bin/eslint.js
+  checksum: fd73d07ce0b73e5ea950b295a6eaf8d45914b4e56cba4ef49e55a36dc7e965a4865f63f618c0a096a01d089752d9e44180b80ba8657039b8e631dd40e0af1663
   languageName: node
   linkType: hard
 
@@ -6813,7 +6892,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "example@workspace:example"
   dependencies:
-    gatsby: ^3.10.0
+    gatsby: ^3.10.2
     gatsby-plugin-wrap-pages: "*"
     react: ^17
     react-dom: ^17
@@ -7390,7 +7469,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fs-extra@npm:*":
+"fs-extra@npm:*, fs-extra@npm:^10.0.0":
   version: 10.0.0
   resolution: "fs-extra@npm:10.0.0"
   dependencies:
@@ -7813,19 +7892,19 @@ fsevents@^1.2.7:
   dependencies:
     "@testing-library/react": ^12.0.0
     babel-eslint: ^10.1.0
-    chokidar: "*"
-    eslint: ^7.30.0
+    chokidar: ^3.5.2
+    eslint: ^7.31.0
     eslint-config-react-app: ^6.0.0
-    eslint-plugin-flowtype: ^5.8.0
+    eslint-plugin-flowtype: ^5.8.1
     eslint-plugin-import: ^2.23.4
-    eslint-plugin-jest: ^24.3.6
+    eslint-plugin-jest: ^24.4.0
     eslint-plugin-jsx-a11y: ^6.4.1
     eslint-plugin-react: ^7.24.0
     eslint-plugin-react-hooks: ^4.2.0
-    fs-extra: "*"
-    gatsby-core-utils: "*"
+    fs-extra: ^10.0.0
+    gatsby-core-utils: ^2.10.0
     jest: ^27.0.6
-    signal-exit: "*"
+    signal-exit: ^3.0.3
   peerDependencies:
     gatsby: "*"
     react: "*"
@@ -8218,9 +8297,9 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"gatsby@npm:^3.10.0":
-  version: 3.10.0
-  resolution: "gatsby@npm:3.10.0"
+"gatsby@npm:^3.10.2":
+  version: 3.10.2
+  resolution: "gatsby@npm:3.10.2"
   dependencies:
     "@babel/code-frame": ^7.14.0
     "@babel/core": ^7.14.6
@@ -8379,7 +8458,7 @@ fsevents@^1.2.7:
     react-dom: ^16.9.0 || ^17.0.0
   bin:
     gatsby: ./cli.js
-  checksum: 2c7303e80ee67ac3dd68127d609e509418de2d7fe0cb70f6a2e6a7ec2e161f9130c658cfe46392175768682522076237b810f125a513652b398facef106577da
+  checksum: d448c1792048847d86c372108a33ab04baa60e38a779d33bc1e63063951edbcc77c8b452c41aae6b8d88f1f1101fd7e8da1d3e407f932aadc45fb07456a57cfd
   languageName: node
   linkType: hard
 
