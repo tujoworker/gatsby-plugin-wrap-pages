@@ -5,7 +5,10 @@ export function wrapPagesDeep({ element }) {
   return (
     <>
       <header align="right">
-        <a href="/" target="_blank">
+        <a
+          href="https://github.com/tujoworker/gatsby-plugin-wrap-pages"
+          target="_blank"
+        >
           Repo
         </a>
       </header>
