@@ -3,7 +3,7 @@ import { Link } from 'gatsby'
 
 export default function Page({ params }) {
   // Just for fun, make a clean array with our dynamic nested paths
-  const paths = params['*'].split('/').filter(Boolean)
+  const paths = params['*']?.split('/').filter(Boolean)
 
   return (
     <>
@@ -11,7 +11,7 @@ export default function Page({ params }) {
       <p>
         ✅ This page also functions as a layout for nested routes: 
         <strong>
-          <output>/{paths.join('/')}</output>
+          <output>/{paths?.join('/')}</output>
         </strong>
       </p>
       <p>

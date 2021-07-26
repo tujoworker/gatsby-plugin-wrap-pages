@@ -225,7 +225,7 @@ function isWrapper({ page, wrapperName = null }) {
 function getPageComponent(page) {
   let wrapPageWith = page.component
 
-  if (page.context?.wrapPageWith) {
+  if (page.context && page.context.wrapPageWith) {
     wrapPageWith = systemPath.join(
       systemPath.isAbsolute(page.context.wrapPageWith)
         ? '/'
