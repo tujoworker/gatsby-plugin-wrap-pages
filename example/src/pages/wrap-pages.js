@@ -8,6 +8,7 @@ export function wrapPagesDeep({ element }) {
         <a
           href="https://github.com/tujoworker/gatsby-plugin-wrap-pages"
           target="_blank"
+          rel="noreferrer"
         >
           Repo
         </a>
