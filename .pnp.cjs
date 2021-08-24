@@ -27,6 +27,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:example"
       },
       {
+        "name": "example-layout",
+        "reference": "workspace:example-layout"
+      },
+      {
         "name": "gatsby-plugin-wrap-pages",
         "reference": "workspace:gatsby-plugin-wrap-pages"
       },
@@ -39,6 +43,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
     "ignorePatternData": "(^(?:\\.yarn\\/sdks(?:\\/(?!\\.{1,2}(?:\\/|$))(?:(?:(?!(?:^|\\/)\\.{1,2}(?:\\/|$)).)*?)|$))$)",
     "fallbackExclusionList": [
       ["example", ["workspace:example"]],
+      ["example-layout", ["workspace:example-layout"]],
       ["gatsby-plugin-wrap-pages", ["virtual:260cbded26170ad9574d8af795f720c814500bad7a46f467f26b2daa1d7cb0583916d1f4f34948412d6d3e69e4f2781f1908be54ba6e3e97f1f75b8445445101#workspace:gatsby-plugin-wrap-pages", "virtual:fa477393f1a229410b80e68b69304c4c8806e14fd621d59c23e05b9b51eabae0372b20fed6b0503ec54ccbfe4b322de2771bb2cdd4827869edf1410aeb760432#workspace:gatsby-plugin-wrap-pages", "workspace:gatsby-plugin-wrap-pages"]],
       ["integration-tests", ["workspace:integration-tests"]],
       ["wrap-pages-monorepo", ["workspace:."]]
@@ -12627,6 +12632,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./example/",
           "packageDependencies": [
             ["example", "workspace:example"],
+            ["gatsby", "virtual:260cbded26170ad9574d8af795f720c814500bad7a46f467f26b2daa1d7cb0583916d1f4f34948412d6d3e69e4f2781f1908be54ba6e3e97f1f75b8445445101#npm:3.12.0"],
+            ["gatsby-plugin-wrap-pages", "virtual:260cbded26170ad9574d8af795f720c814500bad7a46f467f26b2daa1d7cb0583916d1f4f34948412d6d3e69e4f2781f1908be54ba6e3e97f1f75b8445445101#workspace:gatsby-plugin-wrap-pages"],
+            ["react", "npm:17.0.2"],
+            ["react-dom", "virtual:260cbded26170ad9574d8af795f720c814500bad7a46f467f26b2daa1d7cb0583916d1f4f34948412d6d3e69e4f2781f1908be54ba6e3e97f1f75b8445445101#npm:17.0.2"]
+          ],
+          "linkType": "SOFT",
+        }]
+      ]],
+      ["example-layout", [
+        ["workspace:example-layout", {
+          "packageLocation": "./example-layout/",
+          "packageDependencies": [
+            ["example-layout", "workspace:example-layout"],
             ["gatsby", "virtual:260cbded26170ad9574d8af795f720c814500bad7a46f467f26b2daa1d7cb0583916d1f4f34948412d6d3e69e4f2781f1908be54ba6e3e97f1f75b8445445101#npm:3.12.0"],
             ["gatsby-plugin-wrap-pages", "virtual:260cbded26170ad9574d8af795f720c814500bad7a46f467f26b2daa1d7cb0583916d1f4f34948412d6d3e69e4f2781f1908be54ba6e3e97f1f75b8445445101#workspace:gatsby-plugin-wrap-pages"],
             ["react", "npm:17.0.2"],

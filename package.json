@@ -2,6 +2,7 @@
   "name": "wrap-pages-monorepo",
   "workspaces": [
     "example",
+    "example-layout",
     "integration-tests",
     "gatsby-plugin-wrap-pages"
   ],
