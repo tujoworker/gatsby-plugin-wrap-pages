@@ -23,7 +23,7 @@
     "test": "yarn workspace integration-tests test",
     "test:watch": "yarn workspace integration-tests test --watch",
     "lint": "eslint --ext .js --ignore-path ../.gitignore .",
-    "publish": "npm publish"
+    "release": "npm publish"
   },
   "peerDependencies": {
     "gatsby": "*",
