@@ -7188,7 +7188,7 @@ __metadata:
   resolution: "example@workspace:example"
   dependencies:
     gatsby: ^3.12.0
-    gatsby-plugin-wrap-pages: "*"
+    gatsby-plugin-wrap-pages: "workspace:*"
     react: ^17
     react-dom: ^17
   languageName: unknown
@@ -8192,7 +8192,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"gatsby-plugin-wrap-pages@*, gatsby-plugin-wrap-pages@workspace:gatsby-plugin-wrap-pages":
+"gatsby-plugin-wrap-pages@workspace:*, gatsby-plugin-wrap-pages@workspace:gatsby-plugin-wrap-pages":
   version: 0.0.0-use.local
   resolution: "gatsby-plugin-wrap-pages@workspace:gatsby-plugin-wrap-pages"
   dependencies:
@@ -9784,7 +9784,7 @@ fsevents@^1.2.7:
     fs-extra: "*"
     gatsby: "*"
     gatsby-core-utils: "*"
-    gatsby-plugin-wrap-pages: "*"
+    gatsby-plugin-wrap-pages: "workspace:*"
     jest: ^27.0.6
     joi: "*"
     react: "*"

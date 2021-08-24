@@ -8,7 +8,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "gatsby-plugin-wrap-pages": "*"
+    "gatsby-plugin-wrap-pages": "workspace:*"
   },
   "devDependencies": {
     "@babel/runtime": "*",
