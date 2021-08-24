@@ -26,6 +26,11 @@ const getPage = (component = 'src/pages/index.js', merge = null) => [
   },
 ]
 
+jest.mock('path', () => ({
+  ...jest.requireActual('path'),
+  sep: '/',
+}))
+
 describe('wrapper', () => {
   it('should get deleted as a page', async () => {
     const pages = [
@@ -116,6 +121,53 @@ describe('page', () => {
     expect(pageData.context).toMatchObject({
       WPS: [{ hash: 'de24c938e6d0ae34eea46b0360bc707c', isSame: true }],
     })
+  })
+
+  it('should support backslash separator', async () => {
+    systemPath.sep = '\\'
+
+    const pages = [
+      getPage('src/pages/index.js'),
+      getPage('src/pages/wrap-pages.js'),
+    ]
+    await handleWrapperScopesAndPages(getParams({ pages }))
+
+    const page = pages[0] // get the first page
+    const pageData = page[1] // select page content
+    expect(pageData).toHaveProperty('context')
+    expect(pageData.context).toMatchObject({
+      WPS: [{ hash: 'de24c938e6d0ae34eea46b0360bc707c', isSame: true }],
+    })
+
+    systemPath.sep = '/'
+  })
+
+  it('should support backslash directory', async () => {
+    systemPath.sep = '\\'
+
+    const replaceWithBackslash = (arr) => {
+      return arr.map((params) => {
+        if (params.component) {
+          params.component = params.component.replace(/\//g, '\\')
+        }
+        return params
+      })
+    }
+
+    const pages = [
+      replaceWithBackslash(getPage('src/pages/index.js')),
+      replaceWithBackslash(getPage('src/pages/wrap-pages.js')),
+    ]
+    await handleWrapperScopesAndPages(getParams({ pages }))
+
+    const page = pages[0] // get the first page
+    const pageData = page[1] // select page content
+    expect(pageData).toHaveProperty('context')
+    expect(pageData.context).toMatchObject({
+      WPS: [{ hash: '67ae6b2d4c1a1546e0363fb18299322e', isSame: true }],
+    })
+
+    systemPath.sep = '/'
   })
 
   it('should contain isSame on same scope', async () => {

@@ -181,11 +181,12 @@ function generateWrappersToImport({ filterDir }) {
 
 function findValidScopePaths(componentDir) {
   const result = []
-  const parts = componentDir.split(systemPath.sep)
+  const sep = getNodePathSep(componentDir)
+  const parts = componentDir.split(sep)
 
   // eslint-disable-next-line
   for (const i of parts) {
-    const possibleScope = parts.join(systemPath.sep)
+    const possibleScope = parts.join(sep)
 
     if (globalScopeFiles[possibleScope]) {
       result.push(possibleScope)
@@ -217,23 +218,29 @@ function skipThisPage({ page, filterFile, filterDir }) {
 }
 
 function isWrapper({ page, wrapperName = null }) {
+  const sep = getNodePathSep(page.component)
   return getPageComponent(page).includes(
-    '/' + (wrapperName || DEFAULT_WRAPPER_NAME)
+    sep + (wrapperName || DEFAULT_WRAPPER_NAME)
   )
 }
 
 function getPageComponent(page) {
   let wrapPageWith = page.component
+  const sep = getNodePathSep(wrapPageWith)
 
   if (page.context && page.context.wrapPageWith) {
     wrapPageWith = systemPath.join(
       systemPath.isAbsolute(page.context.wrapPageWith)
-        ? '/'
+        ? sep
         : globalThis.directoryRoot,
       page.context.wrapPageWith,
-      systemPath.basename(page.component)
+      systemPath.basename(page.component.replace(/\\/g, '/'))
     )
   }
 
   return wrapPageWith
+}
+
+function getNodePathSep(path) {
+  return path.includes(systemPath.sep) ? systemPath.sep : '/'
 }
