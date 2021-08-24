@@ -8,7 +8,7 @@
     "provider",
     "wrapper"
   ],
-  "version": "1.0.5",
+  "version": "1.0.6",
   "repository": {
     "type": "git",
     "url": "https://github.com/tujoworker/gatsby-plugin-wrap-pages.git"
@@ -23,7 +23,6 @@
     "test": "yarn workspace integration-tests test",
     "test:watch": "yarn workspace integration-tests test --watch",
     "lint": "eslint --ext .js --ignore-path ../.gitignore .",
-    "prepublishOnly": "cp ../README.md ./",
     "publish": "npm publish"
   },
   "peerDependencies": {

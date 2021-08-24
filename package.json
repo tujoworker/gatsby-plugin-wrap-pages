@@ -18,7 +18,7 @@
     "test": "yarn workspace integration-tests test",
     "test:watch": "yarn workspace integration-tests test --watch",
     "lint": "yarn workspace gatsby-plugin-wrap-pages lint",
-    "publish": "yarn workspace gatsby-plugin-wrap-pages publish"
+    "release": "yarn workspace gatsby-plugin-wrap-pages release"
   },
   "publishConfig": {
     "access": "public"
