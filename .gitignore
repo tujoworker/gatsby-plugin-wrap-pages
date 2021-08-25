@@ -7,6 +7,3 @@ public
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
-
-# publish
-gatsby-plugin-wrap-pages/README.md
