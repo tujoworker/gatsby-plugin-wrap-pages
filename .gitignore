@@ -1,5 +1,6 @@
 public
 .cache
+!integration-tests/__mocks__/.cache
 .yarn/*
 .yarn/cache
 !.yarn/patches
