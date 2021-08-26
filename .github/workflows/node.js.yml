@@ -24,5 +24,18 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-      - run: yarn install
-      - run: yarn test
+
+      - name: Use deps cache
+        uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: |
+            ./.yarn/cache
+          key: deps-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install deps
+        # if: steps.yarn-cache.outputs.cache-hit != 'true'
+        run: yarn install
+
+      - name: Use tests
+        run: yarn test
