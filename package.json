@@ -11,11 +11,13 @@
   "author": "Tobias Høegh",
   "version": "0.0.0",
   "scripts": {
-    "start": "yarn workspace example gatsby develop --port=8090",
-    "build": "yarn workspace example gatsby build",
-    "serve": "yarn workspace example gatsby serve --port=9090",
-    "clean": "yarn workspace example gatsby clean",
+    "start": "yarn workspace example develop",
+    "build": "yarn workspace example build",
+    "serve": "yarn workspace example serve",
+    "clean": "yarn workspace example clean",
     "test": "yarn workspace integration-tests test",
+    "test:cypress": "yarn workspace integration-tests test:cypress",
+    "test:cypress:ci": "yarn workspace integration-tests test:cypress:ci",
     "test:watch": "yarn workspace integration-tests test --watch",
     "lint": "yarn workspace gatsby-plugin-wrap-pages lint",
     "release": "yarn workspace gatsby-plugin-wrap-pages release"
