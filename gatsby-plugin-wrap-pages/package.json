@@ -23,8 +23,8 @@
     "test": "yarn workspace integration-tests test",
     "test:watch": "yarn workspace integration-tests test --watch",
     "lint": "eslint --ext .js --ignore-path ../.gitignore .",
-    "release": "standard-version",
-    "release:beta": "standard-version --prerelease beta"
+    "release": "standard-version && yarn npm publish --access public && git push --follow-tags origin main",
+    "release:beta": "standard-version --prerelease beta && yarn npm publish --access public && git push --follow-tags origin beta"
   },
   "peerDependencies": {
     "gatsby": "*",
@@ -48,6 +48,10 @@
     "jest": "^27.0.6",
     "signal-exit": "^3.0.3",
     "standard-version": "^9.3.1"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   },
   "volta": {
     "extends": "../package.json"

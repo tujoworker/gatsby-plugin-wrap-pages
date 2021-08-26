@@ -22,9 +22,6 @@
     "lint": "yarn workspace gatsby-plugin-wrap-pages lint",
     "release": "yarn workspace gatsby-plugin-wrap-pages release"
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "volta": {
     "node": "16.1.0"
   },
