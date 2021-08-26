@@ -1,10 +1,14 @@
 import systemPath from 'path'
+import { writeFile } from 'fs'
 import { handleWrapperScopesAndPages } from 'gatsby-plugin-wrap-pages/plugin-logic'
 
 beforeEach(() => {
-  globalThis.writeTimeoutDelay = 1
   jest.resetAllMocks()
+
+  globalThis.writeTimeoutDelay = 0
   globalThis.directoryRoot = systemPath.resolve('./__mocks__')
+  globalThis.globalScopeFiles = {}
+  globalThis.scopeFilesHash = undefined
 })
 
 const deletePage = jest.fn()
@@ -20,11 +24,21 @@ const getPage = (component = 'src/pages/index.js', merge = null) => [
   'path',
   {
     path: '/path',
-    component: systemPath.join(globalThis.directoryRoot, component),
+    component: systemPath.resolve(
+      globalThis.directoryRoot.replace(/\\/g, '/'),
+      component
+    ),
     context: {},
     ...merge,
   },
 ]
+
+jest.mock('fs', () => {
+  return {
+    ...jest.requireActual('fs'),
+    writeFile: jest.fn(),
+  }
+})
 
 jest.mock('path', () => ({
   ...jest.requireActual('path'),
@@ -76,6 +90,13 @@ describe('wrapper', () => {
     expect(wrapper.scopeData.relativeComponentHash).toBe(
       'a8e85ae8b0a005f5a28a5cb14cf5a31b'
     )
+    expect(writeFile).toHaveBeenCalledTimes(1)
+    expect(writeFile).toHaveBeenCalledWith(
+      systemPath.join(globalThis.directoryRoot, '/.cache/wpe-scopes.js'),
+      `export * as _a8e85ae8b0a005f5a28a5cb14cf5a31b from '../src/pages/first-scope/wrap-pages.js';`,
+      null,
+      expect.any(Function)
+    )
   })
 
   it('should have scopeData with valid data for "second scope"', async () => {
@@ -93,6 +114,13 @@ describe('wrapper', () => {
     )
     expect(wrapper.scopeData.relativeComponentHash).toBe(
       '04a5fd4a912092212894c198071f22d5'
+    )
+    expect(writeFile).toHaveBeenCalledTimes(1)
+    expect(writeFile).toHaveBeenCalledWith(
+      systemPath.join(globalThis.directoryRoot, '/.cache/wpe-scopes.js'),
+      `export * as _04a5fd4a912092212894c198071f22d5 from '../src/pages/first-scope/second-scope/wrap-pages.js';`,
+      null,
+      expect.any(Function)
     )
   })
 })
@@ -125,6 +153,9 @@ describe('page', () => {
 
   it('should support backslash separator', async () => {
     systemPath.sep = '\\'
+    globalThis.directoryRoot = systemPath
+      .resolve('./__mocks__')
+      .replace(/\//g, systemPath.sep)
 
     const pages = [
       getPage('src/pages/index.js'),
@@ -138,17 +169,30 @@ describe('page', () => {
     expect(pageData.context).toMatchObject({
       WPS: [{ hash: 'de24c938e6d0ae34eea46b0360bc707c', isSame: true }],
     })
+    expect(writeFile).toHaveBeenCalledTimes(1)
+    expect(writeFile).toHaveBeenCalledWith(
+      systemPath.join(
+        globalThis.directoryRoot.replace(/\\/g, '/'),
+        '/.cache/wpe-scopes.js'
+      ),
+      `export * as _de24c938e6d0ae34eea46b0360bc707c from '../src/pages/wrap-pages.js';`,
+      null,
+      expect.any(Function)
+    )
 
     systemPath.sep = '/'
   })
 
   it('should support backslash directory', async () => {
     systemPath.sep = '\\'
+    globalThis.directoryRoot = systemPath
+      .resolve('./__mocks__')
+      .replace(/\//g, systemPath.sep)
 
     const replaceWithBackslash = (arr) => {
       return arr.map((params) => {
         if (params.component) {
-          params.component = params.component.replace(/\//g, '\\')
+          params.component = params.component.replace(/\//g, systemPath.sep)
         }
         return params
       })
@@ -164,8 +208,18 @@ describe('page', () => {
     const pageData = page[1] // select page content
     expect(pageData).toHaveProperty('context')
     expect(pageData.context).toMatchObject({
-      WPS: [{ hash: '67ae6b2d4c1a1546e0363fb18299322e', isSame: true }],
+      WPS: [{ hash: 'de24c938e6d0ae34eea46b0360bc707c', isSame: true }],
     })
+    expect(writeFile).toHaveBeenCalledTimes(1)
+    expect(writeFile).toHaveBeenCalledWith(
+      systemPath.join(
+        globalThis.directoryRoot.replace(/\\/g, '/'),
+        '/.cache/wpe-scopes.js'
+      ),
+      `export * as _de24c938e6d0ae34eea46b0360bc707c from '../src/pages/wrap-pages.js';`,
+      null,
+      expect.any(Function)
+    )
 
     systemPath.sep = '/'
   })
@@ -181,12 +235,21 @@ describe('page', () => {
     const pageData = page[1] // select page content
     expect(Array.isArray(pageData.context.WPS)).toBe(true)
     expect(pageData.context.WPS[0].isSame).toBe(true)
+    expect(writeFile).toHaveBeenCalledTimes(1)
+    expect(writeFile).toHaveBeenCalledWith(
+      systemPath.join(globalThis.directoryRoot, '/.cache/wpe-scopes.js'),
+      `export * as _de24c938e6d0ae34eea46b0360bc707c from '../src/pages/wrap-pages.js';`,
+      null,
+      expect.any(Function)
+    )
   })
 
   it('should contain wrapper details with "first scope" as the same', async () => {
     const pages = [
       getPage('src/pages/first-scope/index.js'),
       getPage('src/pages/first-scope/wrap-pages.js'),
+      getPage('src/pages/index.js'),
+      getPage('src/pages/wrap-pages.js'),
     ]
     await handleWrapperScopesAndPages(getParams({ pages }))
 
@@ -198,12 +261,24 @@ describe('page', () => {
         { hash: 'de24c938e6d0ae34eea46b0360bc707c' },
       ],
     })
+    expect(writeFile).toHaveBeenCalledTimes(1)
+    expect(writeFile).toHaveBeenCalledWith(
+      systemPath.join(globalThis.directoryRoot, '/.cache/wpe-scopes.js'),
+      `export * as _a8e85ae8b0a005f5a28a5cb14cf5a31b from '../src/pages/first-scope/wrap-pages.js';
+export * as _de24c938e6d0ae34eea46b0360bc707c from '../src/pages/wrap-pages.js';`,
+      null,
+      expect.any(Function)
+    )
   })
 
   it('should contain wrapper details with "second scope" as the same', async () => {
     const pages = [
       getPage('src/pages/first-scope/second-scope/index.js'),
       getPage('src/pages/first-scope/second-scope/wrap-pages.js'),
+      getPage('src/pages/first-scope/index.js'),
+      getPage('src/pages/first-scope/wrap-pages.js'),
+      getPage('src/pages/index.js'),
+      getPage('src/pages/wrap-pages.js'),
     ]
     await handleWrapperScopesAndPages(getParams({ pages }))
 
@@ -216,12 +291,27 @@ describe('page', () => {
         { hash: 'de24c938e6d0ae34eea46b0360bc707c' },
       ],
     })
+    expect(writeFile).toHaveBeenCalledTimes(1)
+    expect(writeFile).toHaveBeenCalledWith(
+      systemPath.join(globalThis.directoryRoot, '/.cache/wpe-scopes.js'),
+      `export * as _04a5fd4a912092212894c198071f22d5 from '../src/pages/first-scope/second-scope/wrap-pages.js';
+export * as _a8e85ae8b0a005f5a28a5cb14cf5a31b from '../src/pages/first-scope/wrap-pages.js';
+export * as _de24c938e6d0ae34eea46b0360bc707c from '../src/pages/wrap-pages.js';`,
+      null,
+      expect.any(Function)
+    )
   })
 
   it('should contain wrapper details with "none" as the same scope', async () => {
     const pages = [
       getPage('src/pages/first-scope/second-scope/third-scope/index.js'),
       getPage('src/pages/first-scope/second-scope/wrap-pages.js'),
+      getPage('src/pages/first-scope/second-scope/index.js'),
+      getPage('src/pages/first-scope/second-scope/wrap-pages.js'),
+      getPage('src/pages/first-scope/index.js'),
+      getPage('src/pages/first-scope/wrap-pages.js'),
+      getPage('src/pages/index.js'),
+      getPage('src/pages/wrap-pages.js'),
     ]
     await handleWrapperScopesAndPages(getParams({ pages }))
 

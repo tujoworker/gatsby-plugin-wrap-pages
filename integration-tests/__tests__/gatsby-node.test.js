@@ -8,6 +8,7 @@ import { handleWrapperScopesAndPages } from 'gatsby-plugin-wrap-pages/plugin-log
 
 jest.mock('gatsby-plugin-wrap-pages/plugin-logic', () => ({
   __esModule: true,
+  ...jest.requireActual('gatsby-plugin-wrap-pages/plugin-logic'),
   handleWrapperScopesAndPages: jest.fn(async (params) => {
     return params
   }),

@@ -7,14 +7,16 @@ const { pageDataExists, writePageData } = require('gatsby/dist/utils/page-data')
 const DEFAULT_WRAPPER_NAME = 'wrap-pages'
 
 // Containers
-const globalScopeFiles = {}
+globalThis.globalScopeFiles = {}
 
 // Export all so we also can mock them
 exports.handleWrapperScopesAndPages = handleWrapperScopesAndPages
 exports.isWrapper = isWrapper
+exports.fixBackslash = fixBackslash
 exports.DEFAULT_WRAPPER_NAME = DEFAULT_WRAPPER_NAME
 
 async function handleWrapperScopesAndPages(params) {
+  globalThis.directoryRoot = fixBackslash(globalThis.directoryRoot)
   await collectWrappers(params)
   await updateContextInPages(params)
   await writeWrapperImportsCache(params)
@@ -37,17 +39,18 @@ async function collectWrappers({
     if (isWrapper({ page, wrapperName })) {
       actions.deletePage(page)
 
+      const componentPath = getPageComponent(page)
       page.scopeData = page.scopeData || {}
       page.scopeData.relativeComponentPath = systemPath.relative(
         globalThis.directoryRoot,
-        getPageComponent(page)
+        componentPath
       )
       page.scopeData.relativeComponentHash = createContentDigest(
         page.scopeData.relativeComponentPath
       )
 
-      const dirPath = systemPath.dirname(getPageComponent(page))
-      globalScopeFiles[dirPath] = page
+      const dirPath = systemPath.dirname(componentPath)
+      globalThis.globalScopeFiles[dirPath] = page
     }
   }
 }
@@ -80,9 +83,9 @@ async function updateContextInPages({
       page.context.WPS = []
 
       for (const scopePath of scopePaths) {
-        if (globalScopeFiles[scopePath]) {
+        if (globalThis.globalScopeFiles[scopePath]) {
           const { relativeComponentHash: hash } =
-            globalScopeFiles[scopePath].scopeData
+            globalThis.globalScopeFiles[scopePath].scopeData
           const isSame = dirPath === scopePath
           if (isSame) {
             page.context.WPS.push({ hash, isSame })
@@ -137,10 +140,7 @@ async function writeWrapperImportsCache({ filterDir }) {
       '.cache/wpe-scopes.js'
     )
 
-    // Delay the write process,
-    // if do not delay it, unresolved modules will block future Gatsby activity
-    clearTimeout(globalThis.writeTimeout)
-    globalThis.writeTimeout = setTimeout(() => {
+    const writeCacheToDisk = () => {
       fs.writeFile(cacheFilePath, cacheFileContent.join('\n'))
 
       /*
@@ -153,23 +153,37 @@ async function writeWrapperImportsCache({ filterDir }) {
 		  final state, and will not transition.
 		  Event: {"type":"xstate.after(200)#waitingMachine.aggrega
 		  tingFileChanges"}
-		*/
-    }, globalThis.writeTimeoutDelay || 1e3)
+      */
+    }
+
+    if (globalThis.writeTimeoutDelay === 0) {
+      writeCacheToDisk()
+    } else {
+      // Delay the write process,
+      // if do not delay it, unresolved modules will block future Gatsby activity
+      clearTimeout(globalThis.writeTimeout)
+      globalThis.writeTimeout = setTimeout(
+        writeCacheToDisk,
+        globalThis.writeTimeoutDelay || 1e3
+      )
+    }
   }
 }
 
 function generateWrappersToImport({ filterDir }) {
   const result = []
-  for (let dirPath in globalScopeFiles) {
-    const scope = globalScopeFiles[dirPath]
+  for (let dirPath in globalThis.globalScopeFiles) {
+    const scope = globalThis.globalScopeFiles[dirPath]
     if (filterDir) {
       if (!fs.existsSync(scope.component)) {
-        delete globalScopeFiles[dirPath]
+        delete globalThis.globalScopeFiles[dirPath]
         continue
       }
     }
+
     result.push(
-      `export * as _${scope.scopeData.relativeComponentHash} from '../${scope.scopeData.relativeComponentPath.replace(/\\/g, '/')}';`
+      `export * as _${scope.scopeData.relativeComponentHash} from '../${scope.scopeData.relativeComponentPath}';`
+      // ensure we always use a forwards slash when creating relative paths
     )
   }
 
@@ -181,19 +195,19 @@ function generateWrappersToImport({ filterDir }) {
 
 function findValidScopePaths(componentDir) {
   const result = []
-  const sep = getNodePathSep(componentDir)
-  const parts = componentDir.split(sep)
+  const parts = componentDir.split('/')
+  const directoryRoot = globalThis.directoryRoot
 
   // eslint-disable-next-line
   for (const i of parts) {
-    const possibleScope = parts.join(sep)
+    const possibleScope = parts.join('/')
 
-    if (globalScopeFiles[possibleScope]) {
+    if (globalThis.globalScopeFiles[possibleScope]) {
       result.push(possibleScope)
     }
 
     // Bail out once we have reached the Gatsby instance root
-    if (possibleScope === globalThis.directoryRoot) {
+    if (possibleScope === directoryRoot) {
       break
     }
 
@@ -204,11 +218,12 @@ function findValidScopePaths(componentDir) {
 }
 
 function skipThisPage({ page, filterFile, filterDir }) {
-  if (filterFile && getPageComponent(page) !== filterFile) {
+  const componentPath = getPageComponent(page)
+  if (filterFile && componentPath !== filterFile) {
     return true
   }
 
-  const dirPath = systemPath.dirname(getPageComponent(page))
+  const dirPath = systemPath.dirname(componentPath)
 
   if (filterDir && !dirPath.includes(filterDir)) {
     return true
@@ -218,29 +233,28 @@ function skipThisPage({ page, filterFile, filterDir }) {
 }
 
 function isWrapper({ page, wrapperName = null }) {
-  const sep = getNodePathSep(page.component)
   return getPageComponent(page).includes(
-    sep + (wrapperName || DEFAULT_WRAPPER_NAME)
+    '/' + (wrapperName || DEFAULT_WRAPPER_NAME)
   )
 }
 
-function getPageComponent(page) {
-  let wrapPageWith = page.component
-  const sep = getNodePathSep(wrapPageWith)
+function fixBackslash(path) {
+  return path.includes('\\') ? path.replace(/\\/g, '/') : path
+}
 
+function getPageComponent(page) {
+  let componentPath = fixBackslash(page.component)
+
+  // Handle createPage context
   if (page.context && page.context.wrapPageWith) {
-    wrapPageWith = systemPath.join(
+    componentPath = systemPath.join(
       systemPath.isAbsolute(page.context.wrapPageWith)
-        ? sep
+        ? '/'
         : globalThis.directoryRoot,
       page.context.wrapPageWith,
-      systemPath.basename(page.component.replace(/\\/g, '/'))
+      systemPath.basename(componentPath)
     )
   }
 
-  return wrapPageWith
-}
-
-function getNodePathSep(path) {
-  return path.includes(systemPath.sep) ? systemPath.sep : '/'
+  return componentPath
 }
