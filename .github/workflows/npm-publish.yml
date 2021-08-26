@@ -22,7 +22,9 @@ jobs:
           node-version: lts/*
 
       - name: Publish if version has been updated
-        uses: JS-DevTools/npm-publish@v1
+        uses: mikeal/merge-release@master
         with:
-          token: ${{ secrets.NPM_AUTH_TOKEN }}
-          package: ./gatsby-plugin-wrap-pages/package.json
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+          DEPLOY_DIR: gatsby-plugin-wrap-pages
+          SRC_PACKAGE_DIR: gatsby-plugin-wrap-pages
