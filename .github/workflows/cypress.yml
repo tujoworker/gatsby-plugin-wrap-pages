@@ -26,16 +26,25 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Use cache
+      - name: Use deps cache
         uses: actions/cache@v2
         id: yarn-cache
         with:
           path: |
             ./.yarn/cache
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          key: deps-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Use Gatsby cache
+        uses: actions/cache@v2
+        id: gatsby-cache
+        with:
+          path: |
+            ./example/.cache
+            ./example/public
+          key: gatsby-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install deps
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
+        # if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install
 
       - name: Use Cypress.io
@@ -43,5 +52,6 @@ jobs:
         env:
           DEBUG: '@cypress/github-action'
         with:
+          install: false
           working-directory: integration-tests
           command: yarn test:cypress:ci
