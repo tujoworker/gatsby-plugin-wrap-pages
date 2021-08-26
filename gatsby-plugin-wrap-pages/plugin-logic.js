@@ -169,7 +169,7 @@ function generateWrappersToImport({ filterDir }) {
       }
     }
     result.push(
-      `export * as _${scope.scopeData.relativeComponentHash} from '../${scope.scopeData.relativeComponentPath}';`
+      `export * as _${scope.scopeData.relativeComponentHash} from '../${scope.scopeData.relativeComponentPath.replace(/\\/g, '/')}';`
     )
   }
 
