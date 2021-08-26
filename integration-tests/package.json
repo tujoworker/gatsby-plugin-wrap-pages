@@ -5,7 +5,12 @@
   "license": "MIT",
   "author": "Tobias Høegh",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "cypress:build": "yarn workspace example build",
+    "cypress:start": "yarn workspace example serve",
+    "start-server": "yarn cypress:build && yarn cypress:start",
+    "test:cypress": "cypress run",
+    "test:cypress:ci": "start-server-and-test start-server http://localhost:9090 test:cypress"
   },
   "dependencies": {
     "gatsby-plugin-wrap-pages": "workspace:*"
@@ -15,13 +20,15 @@
     "@testing-library/react": "^12.0.0",
     "babel-preset-gatsby": "*",
     "chokidar": "*",
+    "cypress": "^8.3.0",
     "fs-extra": "*",
     "gatsby": "*",
     "gatsby-core-utils": "*",
     "jest": "^27.0.6",
     "joi": "*",
     "react": "*",
-    "signal-exit": "*"
+    "signal-exit": "*",
+    "start-server-and-test": "^1.13.1"
   },
   "volta": {
     "extends": "../package.json"
