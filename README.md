@@ -26,13 +26,15 @@ Why? Everything is possible with vanilla Gatsby – what this Plugin offers, is 
 It supports:
 
 - TypeScript
+- Gatsby Themes and Plugins
+- Gatsby Plugins used as [Micro Frontends](https://www.youtube.com/watch?v=0Ta-awtLZTs)
 - SSR (SSG) and client-side rendering with the same wrapper
 - Wrap your pages with HTML Elements, React Components or Providers
 - Wrap pages in current directory
 - Wrap pages deep (nested)
 - Nested wrappers
 - Programmatically created pages
-- Customize the name of the wrapper file
+- Custom name of the wrapper file
 
 Live [Demo](https://gatsby-plugin-wrap-pages.netlify.app/) 🚀 provided by the [example code](https://github.com/tujoworker/gatsby-plugin-wrap-pages/tree/main/example).
 

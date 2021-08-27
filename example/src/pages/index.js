@@ -8,8 +8,13 @@ export default function Page() {
         padding: '1rem',
       }}
     >
-      <p>This page is NOT wrapped, except with the main wrapper.</p>
-      <Link to="/sub-page">Go to a wrapped page</Link>
+      <h1>Welcome to this little demo</h1>
+      <p>Let's explore together several different methods of wrapping pages.</p>
+      <p>
+        This very first page is only wrapped with a <code>{'<main>'}</code>{' '}
+        Element.
+      </p>
+      <Link to="/sub-page">Go ahead ...</Link>
     </div>
   )
 }
