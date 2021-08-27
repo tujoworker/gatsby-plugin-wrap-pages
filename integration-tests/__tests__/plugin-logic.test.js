@@ -151,56 +151,24 @@ describe('page', () => {
     })
   })
 
-  it('should support backslash separator', async () => {
-    systemPath.sep = '\\'
-    globalThis.directoryRoot = systemPath
-      .resolve('./__mocks__')
-      .replace(/\//g, systemPath.sep)
+  it('should support wrapPageWith', async () => {
+    globalThis.directoryRoot = systemPath.resolve('./__mocks__')
 
-    const pages = [
-      getPage('src/pages/index.js'),
-      getPage('src/pages/wrap-pages.js'),
-    ]
-    await handleWrapperScopesAndPages(getParams({ pages }))
-
-    const page = pages[0] // get the first page
-    const pageData = page[1] // select page content
-    expect(pageData).toHaveProperty('context')
-    expect(pageData.context).toMatchObject({
-      WPS: [{ hash: 'de24c938e6d0ae34eea46b0360bc707c', isSame: true }],
-    })
-    expect(writeFile).toHaveBeenCalledTimes(1)
-    expect(writeFile).toHaveBeenCalledWith(
-      systemPath.join(
-        globalThis.directoryRoot.replace(/\\/g, '/'),
-        '/.cache/wpe-scopes.js'
-      ),
-      `export * as _de24c938e6d0ae34eea46b0360bc707c from '../src/pages/wrap-pages.js';`,
-      null,
-      expect.any(Function)
-    )
-
-    systemPath.sep = '/'
-  })
-
-  it('should support backslash directory', async () => {
-    systemPath.sep = '\\'
-    globalThis.directoryRoot = systemPath
-      .resolve('./__mocks__')
-      .replace(/\//g, systemPath.sep)
-
-    const replaceWithBackslash = (arr) => {
+    const convertTo_wrapPageWith = (arr) => {
       return arr.map((params) => {
         if (params.component) {
-          params.component = params.component.replace(/\//g, systemPath.sep)
+          params.context = {
+            wrapPageWith: systemPath.dirname(params.component),
+          }
+          params.component = systemPath.basename(params.component)
         }
         return params
       })
     }
 
     const pages = [
-      replaceWithBackslash(getPage('src/pages/index.js')),
-      replaceWithBackslash(getPage('src/pages/wrap-pages.js')),
+      convertTo_wrapPageWith(getPage('./src/pages/index.js')),
+      convertTo_wrapPageWith(getPage('./src/pages/wrap-pages.js')),
     ]
     await handleWrapperScopesAndPages(getParams({ pages }))
 
@@ -212,16 +180,11 @@ describe('page', () => {
     })
     expect(writeFile).toHaveBeenCalledTimes(1)
     expect(writeFile).toHaveBeenCalledWith(
-      systemPath.join(
-        globalThis.directoryRoot.replace(/\\/g, '/'),
-        '/.cache/wpe-scopes.js'
-      ),
+      systemPath.join(globalThis.directoryRoot, '/.cache/wpe-scopes.js'),
       `export * as _de24c938e6d0ae34eea46b0360bc707c from '../src/pages/wrap-pages.js';`,
       null,
       expect.any(Function)
     )
-
-    systemPath.sep = '/'
   })
 
   it('should contain isSame on same scope', async () => {
