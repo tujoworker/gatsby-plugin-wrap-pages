@@ -8,7 +8,7 @@
     "provider",
     "wrapper"
   ],
-  "version": "1.0.9",
+  "version": "0.0.0-development",
   "repository": {
     "type": "git",
     "url": "https://github.com/tujoworker/gatsby-plugin-wrap-pages.git"
@@ -23,8 +23,8 @@
     "test": "yarn workspace integration-tests test",
     "test:watch": "yarn workspace integration-tests test --watch",
     "lint": "eslint --ext .js --ignore-path ../.gitignore .",
-    "release": "standard-version && yarn npm publish --access public && git push --follow-tags origin main",
-    "release:beta": "standard-version --prerelease beta && yarn npm publish --access public && git push --follow-tags origin beta"
+    "release": "semantic-release",
+    "release:dry": "semantic-release --dry-run"
   },
   "peerDependencies": {
     "gatsby": "*",
@@ -46,12 +46,11 @@
     "fs-extra": "^10.0.0",
     "gatsby-core-utils": "^2.12.0",
     "jest": "^27.0.6",
-    "signal-exit": "^3.0.3",
-    "standard-version": "^9.3.1"
+    "semantic-release": "^17.4.7",
+    "signal-exit": "^3.0.3"
   },
   "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org"
+    "access": "public"
   },
   "volta": {
     "extends": "../package.json"

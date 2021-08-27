@@ -8,8 +8,8 @@ on:
     branches: [main, beta]
 
 jobs:
-  npm-publish:
-    name: npm-publish
+  release:
+    name: Release
     runs-on: ubuntu-latest
 
     steps:
@@ -19,8 +19,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 16.1.0
-          registry-url: 'https://registry.npmjs.org'
+          node-version: 16.x
 
       - name: Use deps cache
         uses: actions/cache@v2
@@ -31,22 +30,15 @@ jobs:
           key: deps-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install deps
-        # if: steps.yarn-cache.outputs.cache-hit != 'true'
-        run: yarn install
+        run: yarn install --frozen-lockfile
 
       - name: Set git config
         run: |
           git config --global user.name 'Tobias Høegh'
           git config --global user.email 'tobias@tujo.no'
 
-      - name: Publish as latest
-        if: github.ref == 'refs/heads/main'
+      - name: Publish to NPM
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: yarn workspace gatsby-plugin-wrap-pages release
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-
-      - name: Publish as beta
-        if: github.ref == 'refs/heads/beta'
-        run: yarn workspace gatsby-plugin-wrap-pages release:beta
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

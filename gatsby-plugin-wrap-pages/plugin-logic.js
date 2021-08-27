@@ -41,10 +41,9 @@ async function collectWrappers({
 
       const componentPath = getPageComponent(page)
       page.scopeData = page.scopeData || {}
-      page.scopeData.relativeComponentPath = fixBackslash(systemPath.relative(
-        globalThis.directoryRoot,
-        componentPath
-      ))
+      page.scopeData.relativeComponentPath = fixBackslash(
+        systemPath.relative(globalThis.directoryRoot, componentPath)
+      )
       console.log('\nhash', page.scopeData.relativeComponentPath)
       page.scopeData.relativeComponentHash = createContentDigest(
         page.scopeData.relativeComponentPath
