@@ -12,11 +12,9 @@ globalThis.globalScopeFiles = {}
 // Export all so we also can mock them
 exports.handleWrapperScopesAndPages = handleWrapperScopesAndPages
 exports.isWrapper = isWrapper
-exports.fixBackslash = fixBackslash
 exports.DEFAULT_WRAPPER_NAME = DEFAULT_WRAPPER_NAME
 
 async function handleWrapperScopesAndPages(params) {
-  globalThis.directoryRoot = fixBackslash(globalThis.directoryRoot)
   await collectWrappers(params)
   await updateContextInPages(params)
   await writeWrapperImportsCache(params)
@@ -143,7 +141,7 @@ async function writeWrapperImportsCache({ filterDir }) {
       fs.writeFile(cacheFilePath, cacheFileContent.join('\n'))
 
       /*
-		  Also, when we use "writing to disk" without a delay, 
+      Also, when we use "writing to disk" without a delay, 
 		  we get this warning:
 		  
 		  warn Warning: Event "xstate.after(200)#waitingMachine.ag
@@ -242,16 +240,18 @@ function fixBackslash(path) {
 }
 
 function getPageComponent(page) {
-  let componentPath = fixBackslash(page.component)
+  let componentPath = page.component
 
   // Handle createPage context
   if (page.context && page.context.wrapPageWith) {
-    componentPath = systemPath.join(
-      systemPath.isAbsolute(page.context.wrapPageWith)
-        ? '/'
-        : globalThis.directoryRoot,
-      page.context.wrapPageWith,
-      systemPath.basename(componentPath)
+    componentPath = fixBackslash(
+      systemPath.resolve(
+        systemPath.isAbsolute(page.context.wrapPageWith)
+          ? '/'
+          : globalThis.directoryRoot,
+        systemPath.resolve(page.context.wrapPageWith),
+        systemPath.basename(componentPath)
+      )
     )
   }
 

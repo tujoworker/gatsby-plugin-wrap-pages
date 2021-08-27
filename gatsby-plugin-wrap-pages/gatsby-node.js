@@ -5,7 +5,6 @@ const { slash } = require('gatsby-core-utils')
 const {
   handleWrapperScopesAndPages,
   isWrapper,
-  fixBackslash,
   DEFAULT_WRAPPER_NAME,
 } = require('./plugin-logic')
 
@@ -39,7 +38,7 @@ exports.onPostBootstrap = async (
   { wrapperName = null } = {}
 ) => {
   const { program, pages } = store.getState()
-  globalThis.directoryRoot = fixBackslash(program.directory)
+  globalThis.directoryRoot = program.directory
 
   await handleWrapperScopesAndPages({
     pages,

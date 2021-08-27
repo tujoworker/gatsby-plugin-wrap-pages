@@ -12,6 +12,8 @@ jobs:
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
+    env:
+      CYPRESS_CACHE_FOLDER: ~/.cache/Cypress
 
     steps:
       - uses: actions/checkout@v2
@@ -38,16 +40,19 @@ jobs:
             ./example/public
           key: gatsby-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
+      - name: Use Cypress cache
+        uses: actions/cache@v2
+        id: cypress-binary-cache
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-binary-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+
       - name: Install deps
         run: yarn install --immutable
 
       - name: Install Cypress
-        uses: cypress-io/github-action@v2
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
-        with:
-          install: true
-          runTests: false
-          working-directory: integration-tests
+        if: steps.cypress-binary-cache.outputs.cache-hit != 'true'
+        run: yarn workspace integration-tests cypress install
 
       - name: Use Cypress
         uses: cypress-io/github-action@v2
