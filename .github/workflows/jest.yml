@@ -30,7 +30,7 @@ jobs:
           key: deps-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install deps
-        run: yarn install --immutable
+        run: yarn install --immutable-cache
 
       - name: Use tests
         run: yarn test

@@ -48,7 +48,7 @@ jobs:
           key: cypress-binary-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install deps
-        run: yarn install --immutable
+        run: yarn install --immutable-cache
 
       - name: Install Cypress
         if: steps.cypress-binary-cache.outputs.cache-hit != 'true'
