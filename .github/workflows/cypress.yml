@@ -8,10 +8,14 @@ on:
 
 jobs:
   build:
+    name: Cypress tests
+
     strategy:
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
+
     runs-on: ${{ matrix.platform }}
+
     env:
       CYPRESS_CACHE_FOLDER: ~/.cache/Cypress
 
@@ -27,8 +31,7 @@ jobs:
         uses: actions/cache@v2
         id: yarn-cache
         with:
-          path: |
-            ./.yarn/cache
+          path: ./.yarn/cache
           key: deps-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: Use Gatsby cache
@@ -48,7 +51,7 @@ jobs:
           key: cypress-binary-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install deps
-        run: yarn install --immutable-cache
+        run: yarn install --immutable
 
       - name: Install Cypress
         if: steps.cypress-binary-cache.outputs.cache-hit != 'true'
