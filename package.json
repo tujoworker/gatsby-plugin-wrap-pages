@@ -3,6 +3,7 @@
   "workspaces": [
     "example",
     "example-layout",
+    "example-micro-frontends/*",
     "integration-tests",
     "gatsby-plugin-wrap-pages"
   ],
