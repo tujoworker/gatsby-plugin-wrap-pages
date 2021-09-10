@@ -13,7 +13,7 @@
   "dependencies": {
     "gatsby": "^3.13.0",
     "gatsby-plugin-wrap-pages": "workspace:*",
-    "react": "^17",
-    "react-dom": "^17"
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   }
 }
