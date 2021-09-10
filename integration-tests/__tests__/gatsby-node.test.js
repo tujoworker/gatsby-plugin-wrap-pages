@@ -16,7 +16,7 @@ jest.mock('gatsby-plugin-wrap-pages/plugin-logic', () => ({
 
 beforeEach(() => {
   jest.resetAllMocks()
-  globalThis.directoryRoot = null
+  globalThis.WPDirectoryRoot = null
 })
 
 describe('pluginOptionsSchema', () => {
@@ -59,7 +59,7 @@ describe('onCreateWebpackConfig', () => {
 
     const pluginOptions = {} // wrapperName
 
-    globalThis.directoryRoot = '/absolute-root'
+    globalThis.WPDirectoryRoot = '/absolute-root'
     onCreateWebpackConfig(getConfig(), pluginOptions)
 
     expect(setWebpackConfig).toBeCalledWith({
@@ -90,9 +90,9 @@ describe('onPostBootstrap', () => {
   const pluginOptions = {}
 
   it('should set directoryRoot', async () => {
-    expect(globalThis.directoryRoot).toBe(null)
+    expect(globalThis.WPDirectoryRoot).toBe(null)
     await onPostBootstrap(getConfig(), pluginOptions)
-    expect(globalThis.directoryRoot).toBe(directory)
+    expect(globalThis.WPDirectoryRoot).toBe(directory)
   })
 
   it('should call handleWrapperScopesAndPages', async () => {
