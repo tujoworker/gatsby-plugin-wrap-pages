@@ -9,9 +9,9 @@ const {
 } = require('./plugin-logic')
 
 // Global instances
-globalThis.directoryRoot = null
-globalThis.scopeFilesHash = null
-globalThis.writeTimeout = null
+globalThis.WPDirectoryRoot = null
+globalThis.WPScopeFilesHash = null
+globalThis.WPWriteTimeout = null
 
 exports.pluginOptionsSchema = ({ Joi }) => {
   return Joi.object({
@@ -21,7 +21,7 @@ exports.pluginOptionsSchema = ({ Joi }) => {
 
 exports.onCreateWebpackConfig = ({ actions, plugins }) => {
   const cacheFilePath = systemPath.resolve(
-    globalThis.directoryRoot,
+    globalThis.WPDirectoryRoot,
     '.cache/wpe-scopes.js'
   )
   actions.setWebpackConfig({
@@ -33,12 +33,78 @@ exports.onCreateWebpackConfig = ({ actions, plugins }) => {
   })
 }
 
+global.WPS_flattenedPlugins = {}
+
+exports.onPreBootstrap = async (
+  { store, actions },
+  { wrapperName = null } = {}
+) => {
+  const { program, pages, flattenedPlugins, nodesByType, config, ...rest } =
+    store.getState()
+
+  // console.log(
+  //   'test\n',
+  //   nodesByType,
+  //   // JSON.stringify(nodesByType, null, 2),
+  //   // '\n',
+  //   // JSON.stringify(store, null, 2),
+  //   '\n\n'
+  // )
+}
+
 exports.onPostBootstrap = async (
   { store, actions },
   { wrapperName = null } = {}
 ) => {
-  const { program, pages } = store.getState()
-  globalThis.directoryRoot = program.directory
+  // console.log('wrapperName', wrapperName)
+  const { program, pages, flattenedPlugins, nodesByType, config, ...rest } =
+    store.getState()
+  // console.log('rest', { flattenedPlugins }, rest)
+
+  // console.log('nodesByType', Array.from(nodesByType))
+  // console.log('SitePlugin', nodesByType.get('SitePlugin'))
+  // console.log('SitePlugin', nodesByType.get('SitePage'))
+  // console.log('pages', pages)
+
+  // console.log(
+  //   'test\n',
+  //   nodesByType,
+  //   // JSON.stringify(nodesByType, null, 2),
+  //   // '\n',
+  //   // JSON.stringify(store, null, 2),
+  //   '\n\n'
+  // )
+
+  // console.log(
+  //   'test\n',
+  //   JSON.stringify(config.plugins, null, 2),
+  //   '\n\n'
+  // )
+  //   {
+  //     "resolve": "gatsby-plugin-wrap-pages",
+  //     "options": {
+  //       "wrapperName": "main-layout.tsx"
+  //     },
+  //     "parentDir":
+  // "/Users/tobias/dev/repos/gatsby-plugin-wrap-pages/example-micro-frontends/root-app"
+
+  // flattenedPlugins.forEach((plugin) => {
+  //   const name = plugin.name
+  //   if (
+  //     // !/^(load-babel-config|webpack-theme-component-shadowing|bundle-optimisations|internal-)/.test(
+  //     //   name
+  //     // )
+  //     name === 'gatsby-plugin-wrap-pages'
+  //   ) {
+  //     global.WPS_flattenedPlugins[name] = plugin
+  //   }
+  // })
+
+  // console.log('global.WPS_flattenedPlugins', global.WPS_flattenedPlugins)
+
+  // .resolve
+  globalThis.WPDirectoryRoot = program.directory
+  // console.log('onPostBootstrap', globalThis.WPDirectoryRoot)
 
   await handleWrapperScopesAndPages({
     pages,
@@ -78,10 +144,12 @@ exports.onCreateDevServer = (
     }
   })
 
+  // console.log('globalThis.WPDirectoryRoot', globalThis.WPDirectoryRoot)
+
   // Because wrapper files are no pages,
   // we watch if a wrapper gets deleted from the file system (fs)
   const watchPath = systemPath.join(
-    globalThis.directoryRoot,
+    globalThis.WPDirectoryRoot,
     '**',
     wrapperName || DEFAULT_WRAPPER_NAME + '*'
   )

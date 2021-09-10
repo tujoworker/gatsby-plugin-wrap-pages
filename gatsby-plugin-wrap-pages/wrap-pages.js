@@ -1,13 +1,22 @@
 // eslint-disable-next-line
 const WCD_SCOPES = require(WDE_CACHE_PATH)
 
+// For each theme/plugin wrapPageElement gets called
+// This basked helps out so we render one scope per page
+let scopeBasket = {}
+
+// We reset the basked for every new page visited, also during SSR
+export const renewRenderCycle = () => {
+  scopeBasket = {}
+}
+
 export const wrapPageElement = (params) => {
   try {
     if (WCD_SCOPES) {
       const { WPS } = params.props.pageContext
       if (WPS) {
         for (const { hash, isSame } of WPS) {
-          if (hash) {
+          if (hash && !scopeBasket[hash]) {
             const scope = WCD_SCOPES[`_${hash}`]
 
             if (scope) {
@@ -29,9 +38,15 @@ export const wrapPageElement = (params) => {
                 }
               }
 
+              // 3. run the actual render action
               if (scope?.[name]) {
                 const result = scope[name](params)
                 if (result) {
+                  // Store the current hash in the basked
+                  // This way we do not wrap several scopes
+                  scopeBasket[hash] = true
+
+                  // Return the wrapped element
                   params.element = result
                 }
               }
