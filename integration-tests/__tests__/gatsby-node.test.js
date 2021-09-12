@@ -1,4 +1,5 @@
 import Joi from 'joi'
+import reporter from 'gatsby-cli/lib/reporter'
 import {
   onCreateWebpackConfig,
   onPostBootstrap,
@@ -16,7 +17,7 @@ jest.mock('gatsby-plugin-wrap-pages/plugin-logic', () => ({
 
 beforeEach(() => {
   jest.resetAllMocks()
-  globalThis.WPDirectoryRoot = null
+  globalThis.WPProgramDirectory = null
 })
 
 describe('pluginOptionsSchema', () => {
@@ -59,7 +60,7 @@ describe('onCreateWebpackConfig', () => {
 
     const pluginOptions = {} // wrapperName
 
-    globalThis.WPDirectoryRoot = '/absolute-root'
+    globalThis.WPProgramDirectory = '/absolute-root'
     onCreateWebpackConfig(getConfig(), pluginOptions)
 
     expect(setWebpackConfig).toBeCalledWith({
@@ -74,11 +75,22 @@ describe('onCreateWebpackConfig', () => {
 
 describe('onPostBootstrap', () => {
   const directory = '/absolute-root'
+  const config = {
+    plugins: [
+      {
+        resolve: 'gatsby-plugin-wrap-pages',
+        options: { __plugin_uuid: 1 },
+        parentDir: directory,
+      },
+    ],
+  }
   const getConfig = (merge = null) => ({
     ...{
       actions: {},
+      reporter,
       store: {
         getState: () => ({
+          config,
           pages: [],
           program: { directory },
         }),
@@ -90,9 +102,9 @@ describe('onPostBootstrap', () => {
   const pluginOptions = {}
 
   it('should set directoryRoot', async () => {
-    expect(globalThis.WPDirectoryRoot).toBe(null)
+    expect(globalThis.WPProgramDirectory).toBe(null)
     await onPostBootstrap(getConfig(), pluginOptions)
-    expect(globalThis.WPDirectoryRoot).toBe(directory)
+    expect(globalThis.WPProgramDirectory).toBe(directory)
   })
 
   it('should call handleWrapperScopesAndPages', async () => {
@@ -103,5 +115,12 @@ describe('onPostBootstrap', () => {
       pages: [],
       wrapperName: null,
     })
+  })
+
+  it('should set pluginDirectory', async () => {
+    pluginOptions.__plugin_uuid = 1
+    expect(pluginOptions.pluginDirectory).toBe(undefined)
+    await onPostBootstrap(getConfig(), pluginOptions)
+    expect(pluginOptions.pluginDirectory).toBe(directory)
   })
 })

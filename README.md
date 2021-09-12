@@ -194,3 +194,13 @@ The Gatsby `onCreateDevServer` is the last one during warm up, so we add our fil
 We listen for `CREATE_PAGE` to update everything related, both when a page gets created or a new wrapper file gets created.
 
 We also listen for `unlink` so we can update related pages when a wrapper gets deleted.
+
+### Development
+
+To test the add and remove cycle, run:
+
+1. $ `git checkout -- example-micro-frontends/micro-app-home/src/pages/home-layout.tsx`
+
+2. $ `unlink example-micro-frontends/micro-app-home/src/pages/home-layout.tsx`
+
+3. And repeat. Eventually refresh the browser.

@@ -1,7 +1,12 @@
 const systemPath = require('path')
 const fs = require('fs-extra')
 const { createContentDigest } = require('gatsby-core-utils')
-const { pageDataExists, writePageData } = require('gatsby/dist/utils/page-data')
+const {
+  pageDataExists,
+  writePageData,
+  readPageQueryResult,
+  savePageQueryResult,
+} = require('gatsby/dist/utils/page-data')
 
 // Constants
 const DEFAULT_WRAPPER_NAME = 'wrap-pages'
@@ -16,8 +21,8 @@ exports.DEFAULT_WRAPPER_NAME = DEFAULT_WRAPPER_NAME
 
 async function handleWrapperScopesAndPages(params) {
   await collectWrappers(params)
-  await updateContextInPages(params)
   await writeWrapperImportsCache(params)
+  await updateContextInPages(params)
 }
 
 async function collectWrappers({
@@ -41,7 +46,7 @@ async function collectWrappers({
 
       const componentPath = getPageComponent(page)
       const relativePath = fixBackslash(
-        systemPath.relative(globalThis.WPDirectoryRoot, componentPath)
+        systemPath.relative(globalThis.WPProgramDirectory, componentPath)
       )
 
       // Correct plugin in plugin situation
@@ -79,7 +84,7 @@ async function updateContextInPages({
     const dirPath = systemPath.dirname(componentPath)
 
     const relativeDirectoryPath = systemPath.relative(
-      globalThis.WPDirectoryRoot,
+      globalThis.WPProgramDirectory,
       dirPath
     )
     const correctedDirectoryPath = correctRelativePath(relativeDirectoryPath)
@@ -109,33 +114,35 @@ async function updateContextInPages({
         }
       }
 
-      if (filterDir || filterDir) {
-        const publicDir = systemPath.join(globalThis.WPDirectoryRoot, 'public')
+      if (filterFile || filterDir) {
+        const publicDir = systemPath.join(
+          globalThis.WPProgramDirectory,
+          'public'
+        )
 
         if (pageDataExists(publicDir, page.path)) {
-          // This is how Gatsby core finds the path to the cached page context data
-          const inputFilePath = systemPath.join(
-            publicDir,
-            '..',
-            '.cache',
-            'json',
-            `${page.path.replace(/\//g, '_')}.json`
+          // 1. Read page context
+          const result = JSON.parse(
+            await readPageQueryResult(publicDir, page.path)
           )
 
-          if (fs.existsSync(inputFilePath)) {
-            const result = await fs.readJSON(inputFilePath)
-            Object.assign(result.pageContext, page.context)
+          // 2. Update the page context
+          result.pageContext.WPS = page.context.WPS
 
-            // 1. update the cache with the new page context data
-            await fs.writeJSON(inputFilePath, result)
+          // 3. write the page context to the cache
+          await savePageQueryResult(
+            globalThis.WPProgramDirectory,
+            page.path,
+            JSON.stringify(result)
+          )
 
-            // 2. update the real page context data for the effected page
-            await writePageData(publicDir, page)
-          } else {
-            console.warn(
-              `Could not update the page context for "${page.path}" because the pageContext data did not exists in the cache: ${inputFilePath}`
-            )
+          // Ensure the page has at least an empty staticQueryHashes array
+          if (!page.staticQueryHashes) {
+            page.staticQueryHashes = []
           }
+
+          // 4. update the real page context data for the effected page
+          await writePageData(publicDir, page)
         }
       }
     }
@@ -143,45 +150,20 @@ async function updateContextInPages({
 }
 
 async function writeWrapperImportsCache({ filterDir }) {
-  const cacheFileContent = generateWrappersToImport({ filterDir })
+  const cacheFileContent = generateWrappersToImport({ filterDir }).join('\n')
   const scopeFilesHash = createContentDigest(cacheFileContent)
 
-  if (scopeFilesHash !== globalThis.WPScopeFilesHash) {
-    globalThis.WPScopeFilesHash = scopeFilesHash
-
-    const cacheFilePath = systemPath.resolve(
-      globalThis.WPDirectoryRoot,
-      '.cache/wpe-scopes.js'
-    )
-
-    const writeCacheToDisk = () => {
-      fs.writeFile(cacheFilePath, cacheFileContent.join('\n'))
-
-      /*
-      Also, when we use "writing to disk" without a delay, 
-		  we get this warning:
-		  
-		  warn Warning: Event "xstate.after(200)#waitingMachine.ag
-		  gregatingFileChanges" was sent to stopped service
-		  "waitingMachine". This service has already reached its
-		  final state, and will not transition.
-		  Event: {"type":"xstate.after(200)#waitingMachine.aggrega
-		  tingFileChanges"}
-      */
-    }
-
-    if (globalThis.WPWriteTimeoutDelay === 0) {
-      writeCacheToDisk()
-    } else {
-      // Delay the write process,
-      // if do not delay it, unresolved modules will block future Gatsby activity
-      clearTimeout(globalThis.WPWriteTimeout)
-      globalThis.WPWriteTimeout = setTimeout(
-        writeCacheToDisk,
-        globalThis.WPWriteTimeoutDelay || 1e3
-      )
-    }
+  if (scopeFilesHash === globalThis.WPScopeFilesHash) {
+    return // write only once to the file
   }
+  globalThis.WPScopeFilesHash = scopeFilesHash
+
+  const cacheFilePath = systemPath.resolve(
+    globalThis.WPProgramDirectory,
+    '.cache/wpe-scopes.js'
+  )
+
+  await fs.writeFile(cacheFilePath, cacheFileContent)
 }
 
 function generateWrappersToImport({ filterDir }) {
@@ -198,12 +180,8 @@ function generateWrappersToImport({ filterDir }) {
 
     result.push(
       `export * as _${scope.scopeData.relativeComponentHash} from '../${scope.scopeData.relativeComponentPath}';`
-      // ensure we always use a forwards slash when creating relative paths
     )
   }
-
-  // NB: can probably be removed as this does not help for the "first save" issue
-  // result.push('\ndelete require.cache[__filename]')
 
   return result
 }
@@ -218,12 +196,13 @@ function findValidScopePaths(componentDir) {
   // eslint-disable-next-line
   for (const scopePath in globalThis.WPScopeFiles) {
     const scope = globalThis.WPScopeFiles[scopePath]
-    if (componentDir.includes(scope.scopeData.correctedDirectoryPath)) {
+    if (componentDir.startsWith(scope.scopeData.correctedDirectoryPath)) {
       result.push(scopePath)
     }
   }
 
-  return result
+  // return result.reverse()// will this be correct as well?
+  return result.sort((a, b) => (a.length > b.length ? -1 : 1))
 }
 
 function skipThisPage({ page, filterFile, filterDir }) {
@@ -275,7 +254,7 @@ function getPageComponent(page) {
       systemPath.resolve(
         systemPath.isAbsolute(page.context.wrapPageWith)
           ? '/'
-          : globalThis.WPDirectoryRoot,
+          : globalThis.WPProgramDirectory,
         systemPath.resolve(page.context.wrapPageWith),
         systemPath.basename(componentPath)
       )

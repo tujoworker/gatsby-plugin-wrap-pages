@@ -23,6 +23,7 @@
     "cypress": "^8.3.1",
     "fs-extra": "^10.0.0",
     "gatsby": "^3.13.0",
+    "gatsby-cli": "^3.13.0",
     "gatsby-core-utils": "^2.13.0",
     "jest": "^27.1.1",
     "joi": "^17.4.2",

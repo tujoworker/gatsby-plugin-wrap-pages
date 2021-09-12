@@ -17,6 +17,10 @@ export const wrapPageElement = (params) => {
       if (WPS) {
         for (const { hash, isSame } of WPS) {
           if (hash && !scopeBasket[hash]) {
+            // Store the current hash in the basked
+            // This way we do not wrap several scopes
+            scopeBasket[hash] = true
+
             const scope = WCD_SCOPES[`_${hash}`]
 
             if (scope) {
@@ -42,10 +46,6 @@ export const wrapPageElement = (params) => {
               if (scope?.[name]) {
                 const result = scope[name](params)
                 if (result) {
-                  // Store the current hash in the basked
-                  // This way we do not wrap several scopes
-                  scopeBasket[hash] = true
-
                   // Return the wrapped element
                   params.element = result
                 }
@@ -61,6 +61,3 @@ export const wrapPageElement = (params) => {
 
   return params.element
 }
-
-// NB: can probably be removed as this does not help for the "first save" issue
-// delete require.cache[__filename]

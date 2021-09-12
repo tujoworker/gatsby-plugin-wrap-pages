@@ -1,4 +1,6 @@
 public
+node_modules
+*/cypress/screenshots/*
 .cache
 !integration-tests/__mocks__/.cache
 .yarn/*
