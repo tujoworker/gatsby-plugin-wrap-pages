@@ -7778,20 +7778,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"example-layout@workspace:example-layout":
+"example-basic@workspace:example-basic":
   version: 0.0.0-use.local
-  resolution: "example-layout@workspace:example-layout"
-  dependencies:
-    gatsby: ^3.13.0
-    gatsby-plugin-wrap-pages: "workspace:*"
-    react: ^17.0.2
-    react-dom: ^17.0.2
-  languageName: unknown
-  linkType: soft
-
-"example@workspace:example":
-  version: 0.0.0-use.local
-  resolution: "example@workspace:example"
+  resolution: "example-basic@workspace:example-basic"
   dependencies:
     gatsby: ^3.13.0
     gatsby-plugin-wrap-pages: "workspace:*"

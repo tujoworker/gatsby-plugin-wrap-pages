@@ -36,7 +36,7 @@ It supports:
 - Programmatically created pages
 - Custom name of the wrapper file
 
-Live [Demo](https://gatsby-plugin-wrap-pages.netlify.app/) 🚀 provided by the [example code](https://github.com/tujoworker/gatsby-plugin-wrap-pages/tree/main/example).
+Live [Demo](https://gatsby-plugin-wrap-pages.netlify.app/) 🚀 provided by the [example code](https://github.com/tujoworker/gatsby-plugin-wrap-pages/tree/main/example-basic).
 
 ## How to use
 

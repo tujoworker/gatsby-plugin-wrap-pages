@@ -39,8 +39,8 @@ jobs:
         id: gatsby-cache
         with:
           path: |
-            ./example/.cache
-            ./example/public
+            ./example-basic/.cache
+            ./example-basic/public
           key: gatsby-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: Use Cypress cache
