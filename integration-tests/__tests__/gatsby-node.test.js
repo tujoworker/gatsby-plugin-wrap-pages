@@ -3,6 +3,7 @@ import systemPath from 'path'
 import reporter from 'gatsby-cli/lib/reporter'
 import {
   onCreateWebpackConfig,
+  onPreBootstrap,
   onPostBootstrap,
   pluginOptionsSchema,
 } from 'gatsby-plugin-wrap-pages/gatsby-node'
@@ -18,6 +19,8 @@ jest.mock('gatsby-plugin-wrap-pages/plugin-logic', () => ({
 
 beforeEach(() => {
   jest.resetAllMocks()
+  globalThis.WPCoulntPlugin = 1
+  globalThis.WPWrapperNames = []
   globalThis.WPProgramDirectory = null
 })
 
@@ -79,38 +82,71 @@ describe('onCreateWebpackConfig', () => {
   })
 })
 
-describe('onPostBootstrap', () => {
-  const directory = '/absolute-root'
-  const config = {
-    plugins: [
-      {
-        resolve: 'gatsby-plugin-wrap-pages',
-        options: { __plugin_uuid: 1 },
-        parentDir: directory,
-      },
-    ],
-  }
-  const getConfig = (merge = null) => ({
-    ...{
-      actions: {},
-      reporter,
-      store: {
-        getState: () => ({
-          config,
-          pages: [],
-          program: { directory },
-        }),
-      },
+const directory = '/absolute-root'
+const config = Object.freeze({
+  plugins: [
+    {
+      resolve: 'gatsby-plugin-wrap-pages',
+      options: { __plugin_uuid: 1 },
+      parentDir: directory,
     },
-    ...merge,
-  })
+  ],
+})
+const getConfig = (merge = null) => ({
+  ...{
+    actions: {},
+    reporter,
+    store: {
+      getState: () => ({
+        config,
+        pages: [],
+        program: { directory },
+      }),
+    },
+  },
+  ...merge,
+})
 
+describe('onPreBootstrap', () => {
   const pluginOptions = {}
 
   it('should set directoryRoot', async () => {
     expect(globalThis.WPProgramDirectory).toBe(null)
-    await onPostBootstrap(getConfig(), pluginOptions)
+    await onPreBootstrap(getConfig(), pluginOptions)
     expect(globalThis.WPProgramDirectory).toBe(directory)
+  })
+
+  it('should set pluginDirectory', async () => {
+    pluginOptions.__plugin_uuid = 1
+    expect(pluginOptions.pluginDirectory).toBe(undefined)
+    await onPreBootstrap(getConfig(), pluginOptions)
+    expect(pluginOptions.pluginDirectory).toBe(directory)
+  })
+
+  it('should add wrapperName to the global WPWrapperNames', async () => {
+    const pluginOptions = { wrapperName: 'layout.tsx' }
+    expect(globalThis.WPWrapperNames).toHaveLength(0)
+
+    await onPreBootstrap(getConfig(), pluginOptions)
+    expect(globalThis.WPWrapperNames).toHaveLength(1)
+
+    // Second try
+    await onPreBootstrap(getConfig(), pluginOptions)
+    expect(globalThis.WPWrapperNames).toHaveLength(1)
+
+    expect(globalThis.WPWrapperNames).toContain('layout.tsx')
+  })
+})
+
+describe('onPostBootstrap', () => {
+  const pluginOptions = {}
+
+  it('should count the plugin instance', async () => {
+    expect(globalThis.WPCoulntPlugin).toBe(1)
+    await onPostBootstrap(getConfig(), pluginOptions)
+    expect(globalThis.WPCoulntPlugin).toBe(2)
+    await onPostBootstrap(getConfig(), pluginOptions)
+    expect(globalThis.WPCoulntPlugin).toBe(3)
   })
 
   it('should call handleWrapperScopesAndPages', async () => {
@@ -119,14 +155,25 @@ describe('onPostBootstrap', () => {
     expect(handleWrapperScopesAndPages).toHaveBeenCalledWith({
       actions: {},
       pages: [],
-      wrapperName: null,
+      wrapperName: [],
     })
   })
 
-  it('should set pluginDirectory', async () => {
-    pluginOptions.__plugin_uuid = 1
-    expect(pluginOptions.pluginDirectory).toBe(undefined)
+  it('should call handleWrapperScopesAndPages with custom wrapperName', async () => {
+    const pluginOptions = { wrapperName: 'layout.tsx' }
+    await onPreBootstrap(getConfig(), pluginOptions)
     await onPostBootstrap(getConfig(), pluginOptions)
-    expect(pluginOptions.pluginDirectory).toBe(directory)
+    expect(handleWrapperScopesAndPages).toHaveBeenCalledWith({
+      actions: {},
+      pages: [],
+      wrapperName: ['layout.tsx'],
+    })
+  })
+
+  it('should not call handleWrapperScopesAndPages when count has not reached the total', async () => {
+    globalThis.WPCoulntPlugin = -1
+    const pluginOptions = {}
+    await onPostBootstrap(getConfig(), pluginOptions)
+    expect(handleWrapperScopesAndPages).toBeCalledTimes(0)
   })
 })

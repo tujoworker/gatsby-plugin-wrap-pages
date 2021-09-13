@@ -8,7 +8,6 @@ import {
 beforeEach(() => {
   jest.resetAllMocks()
 
-  // globalThis.WPWriteTimeoutDelay = 0 // deprecated
   globalThis.WPProgramDirectory = systemPath.resolve('./__mocks__')
   globalThis.WPScopeFiles = {}
   globalThis.WPScopeFilesHash = undefined
@@ -48,7 +47,7 @@ jest.mock('path', () => ({
 }))
 
 describe('wrapper', () => {
-  it('should run deletePage', async () => {
+  it('should run remove our wrapper as a page + including when filterFile does match', async () => {
     const pages = [
       getPage('src/pages/index.js'),
       getPage('src/pages/wrap-pages.js'),
@@ -56,6 +55,35 @@ describe('wrapper', () => {
     await handleWrapperScopesAndPages(getParams({ pages }))
 
     expect(deletePage).toBeCalledTimes(1)
+
+    await handleWrapperScopesAndPages(
+      getParams({
+        pages,
+        filterFile: convertToForwardslash(
+          systemPath.resolve(
+            globalThis.WPProgramDirectory,
+            'src/pages/wrap-pages.js'
+          )
+        ),
+      })
+    )
+
+    expect(deletePage).toBeCalledTimes(2)
+  })
+
+  it('should skip pages from beeing deleted when filterFile is a match', async () => {
+    const pages = [
+      getPage('src/pages/index.js'),
+      getPage('src/pages/wrap-pages.js'),
+    ]
+    await handleWrapperScopesAndPages(
+      getParams({
+        pages,
+        filterFile: 'no-match',
+      })
+    )
+
+    expect(deletePage).toBeCalledTimes(0)
   })
 
   it('should have scopeData with valid data', async () => {
@@ -67,6 +95,84 @@ describe('wrapper', () => {
 
     const page = pages[1] // get the wrapper
     const wrapper = page[1] // select wrapper content
+    expect(wrapper).toHaveProperty('scopeData')
+    expect(wrapper.scopeData.relativeComponentPath).toBe(
+      'src/pages/wrap-pages.js'
+    )
+    expect(wrapper.scopeData.relativeComponentHash).toBe(
+      'de24c938e6d0ae34eea46b0360bc707c'
+    )
+  })
+
+  it('should handle filterFile properly', async () => {
+    const pages = [
+      getPage('src/pages/index.js'),
+      getPage('src/pages/wrap-pages.js'),
+    ]
+    await handleWrapperScopesAndPages(
+      getParams({
+        pages,
+        filterFile: 'no-match',
+      })
+    )
+
+    const page = pages[1] // get the wrapper
+    const wrapper = page[1] // select wrapper content
+
+    expect(wrapper).not.toHaveProperty('scopeData')
+
+    // Simulate change in wrap-pages.js
+    await handleWrapperScopesAndPages(
+      getParams({
+        pages,
+        filterFile: convertToForwardslash(
+          systemPath.resolve(
+            globalThis.WPProgramDirectory,
+            'src/pages/wrap-pages.js'
+          )
+        ),
+      })
+    )
+
+    expect(wrapper).toHaveProperty('scopeData')
+    expect(wrapper.scopeData.relativeComponentPath).toBe(
+      'src/pages/wrap-pages.js'
+    )
+    expect(wrapper.scopeData.relativeComponentHash).toBe(
+      'de24c938e6d0ae34eea46b0360bc707c'
+    )
+  })
+
+  it('should handle filterDir properly', async () => {
+    const pages = [
+      getPage('src/pages/index.js'),
+      getPage('src/pages/wrap-pages.js'),
+    ]
+    await handleWrapperScopesAndPages(
+      getParams({
+        pages,
+        filterDir: 'no-match',
+      })
+    )
+
+    const page = pages[1] // get the wrapper
+    const wrapper = page[1] // select wrapper content
+
+    expect(wrapper).not.toHaveProperty('scopeData')
+
+    // Simulate change in wrap-pages.js
+    await handleWrapperScopesAndPages(
+      getParams({
+        pages,
+        filterDir: convertToForwardslash(
+          systemPath.dirname(
+            globalThis.WPProgramDirectory,
+            'src/pages/wrap-pages'
+          )
+        ),
+      })
+    )
+
     expect(wrapper).toHaveProperty('scopeData')
     expect(wrapper.scopeData.relativeComponentPath).toBe(
       'src/pages/wrap-pages.js'

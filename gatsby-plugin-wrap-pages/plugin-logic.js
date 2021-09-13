@@ -213,13 +213,13 @@ function findValidScopePaths(componentDir) {
 }
 
 function skipThisPage({ page, filterFile, filterDir }) {
-  const componentPath = getPageComponent(page)
-  if (filterFile && componentPath !== filterFile) {
+  const filePath = getPageComponent(page)
+  // console.log('skipThisPage', { filePath, filterFile })
+  if (filterFile && filePath !== filterFile) {
     return true
   }
 
-  const dirPath = systemPath.dirname(componentPath)
-
+  const dirPath = systemPath.dirname(filePath)
   if (filterDir && !dirPath.includes(filterDir)) {
     return true
   }
@@ -228,14 +228,19 @@ function skipThisPage({ page, filterFile, filterDir }) {
 }
 
 function isWrapper({ page, wrapperName = null }) {
-  // because we already have set a scopeData before, we skip the more expensive check
-  if (page.scopeData) {
-    return true
+  if (!wrapperName) {
+    wrapperName = DEFAULT_WRAPPER_NAME
   }
 
-  return getPageComponent(page).includes(
-    '/' + (wrapperName || DEFAULT_WRAPPER_NAME)
-  )
+  if (typeof wrapperName === 'string') {
+    wrapperName = [wrapperName]
+  }
+
+  const path = getPageComponent(page)
+
+  return wrapperName.some((name) => {
+    return path.includes('/' + name)
+  })
 }
 
 function convertToForwardslash(path) {

@@ -12,7 +12,8 @@ const { name: pluginName } = require('./package.json')
 // Global instances
 globalThis.WPProgramDirectory = null
 globalThis.WPScopeFilesHash = null
-// globalThis.WPWriteTimeout = null // deprecated
+globalThis.WPCoulntPlugin = 0
+globalThis.WPWrapperNames = []
 
 exports.pluginOptionsSchema = ({ Joi }) => {
   return Joi.object({
@@ -36,51 +37,63 @@ exports.onCreateWebpackConfig = ({ actions, plugins }) => {
   })
 }
 
-exports.onPostBootstrap = async (
-  { reporter, store, actions },
-  pluginOptions
-) => {
-  const { wrapperName = null } = pluginOptions
-
-  const activity = reporter.activityTimer(
-    `${chalk.yellowBright(pluginName)} finished, using ${
-      wrapperName || DEFAULT_WRAPPER_NAME
-    }`
-  )
-  activity.start()
+exports.onPreBootstrap = async ({ store }, pluginOptions) => {
+  // Set globally used program directory
+  const { program } = store.getState()
+  globalThis.WPProgramDirectory = program.directory
 
   // And set the current plugin directory
   if (!pluginOptions.pluginDirectory) {
     injectPluginDirectory({ store }, pluginOptions)
   }
 
-  // Set globally used program directory
-  const { program, pages } = store.getState()
-  globalThis.WPProgramDirectory = program.directory
+  // Add the wrapper name to the global list
+  const { wrapperName = DEFAULT_WRAPPER_NAME } = pluginOptions
+  if (wrapperName && !globalThis.WPWrapperNames.includes(wrapperName)) {
+    globalThis.WPWrapperNames.push(wrapperName)
+  }
+}
 
-  await handleWrapperScopesAndPages({
-    pages,
-    actions,
-    wrapperName,
-  })
+exports.onPostBootstrap = async (
+  { reporter, store, actions },
+  pluginOptions
+) => {
+  // Count Plugin instances
+  globalThis.WPCoulntPlugin++
 
-  activity.end()
+  // Go ahead if we have reached the last one
+  // We do this in case this plugin is used within several other themes
+  const totalInstances = countAllPluginInstances({ store }, pluginOptions)
+  if (globalThis.WPCoulntPlugin >= totalInstances) {
+    const activity = reporter.activityTimer(
+      `${chalk.yellowBright(pluginName)} finished`
+    )
+    activity.start()
+
+    const { pages } = store.getState()
+
+    await handleWrapperScopesAndPages({
+      pages,
+      actions,
+      wrapperName: globalThis.WPWrapperNames,
+    })
+
+    activity.end()
+  }
 }
 
 exports.onCreateDevServer = (
   { reporter, store, actions },
   pluginOptions
 ) => {
-  const { wrapperName = null } = pluginOptions
+  const { wrapperName = DEFAULT_WRAPPER_NAME } = pluginOptions
 
   let updateTimeout = null
   const updatePages = async ({ filterFile = null, filterDir = null }) => {
     clearTimeout(updateTimeout)
     updateTimeout = setTimeout(async () => {
       const activity = reporter.activityTimer(
-        `${chalk.yellowBright(pluginName)} finished, using ${
-          wrapperName || DEFAULT_WRAPPER_NAME
-        }`
+        `${chalk.yellowBright(pluginName)} finished`
       )
       activity.start()
 
@@ -88,13 +101,28 @@ exports.onCreateDevServer = (
       await handleWrapperScopesAndPages({
         pages,
         actions,
-        wrapperName,
+        wrapperName: globalThis.WPWrapperNames,
         filterFile,
         filterDir,
       })
 
       activity.end()
-    }, 20) // ensure we run these once
+    }, 20)
+
+    /*
+      Why a 20 ms delay?
+      If we don't delay, Gatsby does hang.
+    
+      When we use "writing to disk" without a delay, 
+		  we get this warning:
+		  
+		  warn Warning: Event "xstate.after(200)#waitingMachine.ag
+		  gregatingFileChanges" was sent to stopped service
+		  "waitingMachine". This service has already reached its
+		  final state, and will not transition.
+		  Event: {"type":"xstate.after(200)#waitingMachine.aggrega
+		  tingFileChanges"}
+    */
   }
 
   // Because wrapper files are no pages,
@@ -102,43 +130,54 @@ exports.onCreateDevServer = (
   const watchPath = systemPath.join(
     pluginOptions.pluginDirectory,
     '**',
-    wrapperName || DEFAULT_WRAPPER_NAME + '*'
+    pluginOptions.wrapperName
+      ? pluginOptions.wrapperName
+      : DEFAULT_WRAPPER_NAME + '*'
   )
-  const watcher = chokidar.watch(watchPath)
+  const watcher = chokidar.watch(watchPath, { ignoreInitial: true })
 
-  setTimeout(() => {
-    watcher?.on('add', (path) => {
-      // const filterFile = slash(path)
-      const filterFile = path
-      const page = { component: filterFile }
+  watcher.on('add', (path) => {
+    const filterFile = path
+    const page = { component: filterFile }
 
-      // 1. check first if the new file is a wrapper
-      if (isWrapper({ page, wrapperName })) {
-        // 2. we will then filter against directories
-        const filterDir = systemPath.dirname(filterFile)
-        updatePages({ filterDir })
-      } else {
-        // 3. instead of pages
-        updatePages({ filterFile })
-      }
-    })
-
-    watcher?.on('unlink', (path) => {
-      const filterDir = systemPath.dirname(path)
+    // 1. check first if the new file is a wrapper
+    if (isWrapper({ page, wrapperName })) {
+      // 2. we will then filter against directories
+      const filterDir = systemPath.dirname(filterFile)
       updatePages({ filterDir })
-    })
-  }, 100) // ensure we first listen when no changes are made
+    } else {
+      // 3. instead of pages
+      updatePages({ filterFile })
+    }
+  })
+
+  watcher.on('unlink', (path) => {
+    const filterDir = systemPath.dirname(path)
+    updatePages({ filterDir })
+  })
 
   onExit(() => {
     watcher.close()
-    watcher = null
   })
 }
 
+function countAllPluginInstances({ store }) {
+  const { config } = store.getState()
+  let count = 0
+
+  config.plugins.forEach((plugin) => {
+    if (plugin.resolve.endsWith(pluginName)) {
+      count++
+    }
+  })
+
+  return count
+}
+
 function injectPluginDirectory({ store }, pluginOptions) {
-  // Find the current plugin directory
   const { config } = store.getState()
 
+  // Inject the current plugin directory to the pluginOptions
   pluginOptions.pluginDirectory = getPlugingConfig(
     config,
     pluginOptions
@@ -156,3 +195,10 @@ function getPlugingConfig(config, pluginOptions) {
     return null
   })
 }
+
+// const formatter = new Intl.ListFormat('en', {
+//   style: 'long',
+// })
+// function concatWrapperNames() {
+//   return formatter.format(globalThis.WPWrapperNames)
+// }
