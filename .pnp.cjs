@@ -39,7 +39,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:example-micro-frontends/micro-app-two"
       },
       {
-        "name": "root-app",
+        "name": "@micro-app/root-app",
         "reference": "workspace:example-micro-frontends/root-app"
       },
       {
@@ -56,11 +56,11 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
     "fallbackExclusionList": [
       ["@micro-app/home", ["workspace:example-micro-frontends/micro-app-home"]],
       ["@micro-app/one", ["workspace:example-micro-frontends/micro-app-one"]],
+      ["@micro-app/root-app", ["workspace:example-micro-frontends/root-app"]],
       ["@micro-app/two", ["workspace:example-micro-frontends/micro-app-two"]],
       ["example-basic", ["workspace:example-basic"]],
       ["gatsby-plugin-wrap-pages", ["virtual:dda383767c7baa3553d7c63526fc20d97d5fdadc179a35fd8882b9a001136107defe3c7c425053686527c6f54adb6d52e0f675ab1ffdc37e91f66b145352aaa4#workspace:gatsby-plugin-wrap-pages", "virtual:fa477393f1a229410b80e68b69304c4c8806e14fd621d59c23e05b9b51eabae0372b20fed6b0503ec54ccbfe4b322de2771bb2cdd4827869edf1410aeb760432#workspace:gatsby-plugin-wrap-pages", "workspace:gatsby-plugin-wrap-pages"]],
       ["integration-tests", ["workspace:integration-tests"]],
-      ["root-app", ["workspace:example-micro-frontends/root-app"]],
       ["wrap-pages-monorepo", ["workspace:."]]
     ],
     "fallbackPool": [
@@ -5265,6 +5265,22 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./example-micro-frontends/micro-app-one/",
           "packageDependencies": [
             ["@micro-app/one", "workspace:example-micro-frontends/micro-app-one"],
+            ["gatsby", "virtual:dda383767c7baa3553d7c63526fc20d97d5fdadc179a35fd8882b9a001136107defe3c7c425053686527c6f54adb6d52e0f675ab1ffdc37e91f66b145352aaa4#npm:3.13.0"],
+            ["gatsby-plugin-wrap-pages", "virtual:dda383767c7baa3553d7c63526fc20d97d5fdadc179a35fd8882b9a001136107defe3c7c425053686527c6f54adb6d52e0f675ab1ffdc37e91f66b145352aaa4#workspace:gatsby-plugin-wrap-pages"],
+            ["react", "npm:17.0.2"],
+            ["react-dom", "virtual:dda383767c7baa3553d7c63526fc20d97d5fdadc179a35fd8882b9a001136107defe3c7c425053686527c6f54adb6d52e0f675ab1ffdc37e91f66b145352aaa4#npm:17.0.2"]
+          ],
+          "linkType": "SOFT",
+        }]
+      ]],
+      ["@micro-app/root-app", [
+        ["workspace:example-micro-frontends/root-app", {
+          "packageLocation": "./example-micro-frontends/root-app/",
+          "packageDependencies": [
+            ["@micro-app/root-app", "workspace:example-micro-frontends/root-app"],
+            ["@micro-app/home", "workspace:example-micro-frontends/micro-app-home"],
+            ["@micro-app/one", "workspace:example-micro-frontends/micro-app-one"],
+            ["@micro-app/two", "workspace:example-micro-frontends/micro-app-two"],
             ["gatsby", "virtual:dda383767c7baa3553d7c63526fc20d97d5fdadc179a35fd8882b9a001136107defe3c7c425053686527c6f54adb6d52e0f675ab1ffdc37e91f66b145352aaa4#npm:3.13.0"],
             ["gatsby-plugin-wrap-pages", "virtual:dda383767c7baa3553d7c63526fc20d97d5fdadc179a35fd8882b9a001136107defe3c7c425053686527c6f54adb6d52e0f675ab1ffdc37e91f66b145352aaa4#workspace:gatsby-plugin-wrap-pages"],
             ["react", "npm:17.0.2"],
@@ -22176,22 +22192,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["glob", "npm:7.1.7"]
           ],
           "linkType": "HARD",
-        }]
-      ]],
-      ["root-app", [
-        ["workspace:example-micro-frontends/root-app", {
-          "packageLocation": "./example-micro-frontends/root-app/",
-          "packageDependencies": [
-            ["root-app", "workspace:example-micro-frontends/root-app"],
-            ["@micro-app/home", "workspace:example-micro-frontends/micro-app-home"],
-            ["@micro-app/one", "workspace:example-micro-frontends/micro-app-one"],
-            ["@micro-app/two", "workspace:example-micro-frontends/micro-app-two"],
-            ["gatsby", "virtual:dda383767c7baa3553d7c63526fc20d97d5fdadc179a35fd8882b9a001136107defe3c7c425053686527c6f54adb6d52e0f675ab1ffdc37e91f66b145352aaa4#npm:3.13.0"],
-            ["gatsby-plugin-wrap-pages", "virtual:dda383767c7baa3553d7c63526fc20d97d5fdadc179a35fd8882b9a001136107defe3c7c425053686527c6f54adb6d52e0f675ab1ffdc37e91f66b145352aaa4#workspace:gatsby-plugin-wrap-pages"],
-            ["react", "npm:17.0.2"],
-            ["react-dom", "virtual:dda383767c7baa3553d7c63526fc20d97d5fdadc179a35fd8882b9a001136107defe3c7c425053686527c6f54adb6d52e0f675ab1ffdc37e91f66b145352aaa4#npm:17.0.2"]
-          ],
-          "linkType": "SOFT",
         }]
       ]],
       ["run-async", [

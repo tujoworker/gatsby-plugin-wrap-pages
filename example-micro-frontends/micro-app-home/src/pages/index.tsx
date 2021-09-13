@@ -10,8 +10,9 @@ export default function Page(props: PageProps) {
         padding: '1rem',
       }}
     >
-      <h1>home</h1>
-      {/* <p>This page is wrapped with the main wrapper.</p> */}
+      <h1>Welcome to this Mico Frontends Example</h1>
+      <p>This page is hosted in @micro-app/home.</p>
+      <p>You may visit some other pages, hosted by other apps:</p>
       <br />
       <Link to="/one">Go to page one</Link>
       <br />

@@ -41,6 +41,8 @@ jobs:
           path: |
             ./example-basic/.cache
             ./example-basic/public
+            ./example-micro-frontends/root-app/.cache
+            ./example-micro-frontends/root-app/public
           key: gatsby-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: Use Cypress cache

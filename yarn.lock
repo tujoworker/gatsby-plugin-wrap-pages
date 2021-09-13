@@ -2347,6 +2347,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@micro-app/root-app@workspace:example-micro-frontends/root-app":
+  version: 0.0.0-use.local
+  resolution: "@micro-app/root-app@workspace:example-micro-frontends/root-app"
+  dependencies:
+    "@micro-app/home": "workspace:*"
+    "@micro-app/one": "workspace:*"
+    "@micro-app/two": "workspace:*"
+    gatsby: ^3.13.0
+    gatsby-plugin-wrap-pages: "workspace:*"
+    react: ^17.0.2
+    react-dom: ^17.0.2
+  languageName: unknown
+  linkType: soft
+
 "@micro-app/two@workspace:*, @micro-app/two@workspace:example-micro-frontends/micro-app-two":
   version: 0.0.0-use.local
   resolution: "@micro-app/two@workspace:example-micro-frontends/micro-app-two"
@@ -15988,20 +16002,6 @@ resolve@^2.0.0-next.3:
   checksum: cdc7f6eacb17927f2a075117a823e1c5951792c6498ebcce81ca8203454a811d4cf8900314154d3259bb8f0b42ab17f67396a8694a54cae3283326e57ad250cd
   languageName: node
   linkType: hard
-
-"root-app@workspace:example-micro-frontends/root-app":
-  version: 0.0.0-use.local
-  resolution: "root-app@workspace:example-micro-frontends/root-app"
-  dependencies:
-    "@micro-app/home": "workspace:*"
-    "@micro-app/one": "workspace:*"
-    "@micro-app/two": "workspace:*"
-    gatsby: ^3.13.0
-    gatsby-plugin-wrap-pages: "workspace:*"
-    react: ^17.0.2
-    react-dom: ^17.0.2
-  languageName: unknown
-  linkType: soft
 
 "run-async@npm:^2.4.0":
   version: 2.4.1

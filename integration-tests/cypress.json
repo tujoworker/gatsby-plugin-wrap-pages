@@ -2,6 +2,5 @@
   "fixturesFolder": false,
   "supportFile": false,
   "pluginsFile": false,
-  "video": false,
-  "baseUrl": "http://localhost:9090/"
+  "video": false
 }
