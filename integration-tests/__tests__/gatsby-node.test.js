@@ -36,7 +36,9 @@ describe('pluginOptionsSchema', () => {
     const schema = pluginOptionsSchema({ Joi })
     const config = { wrapperName: 123 }
     const result = schema.validate(config)
-    expect(result.error.message).toBe('"wrapperName" must be a string')
+    expect(result.error.message).toBe(
+      '"wrapperName" must be one of [string, array]'
+    )
   })
 })
 

@@ -16,7 +16,9 @@ globalThis.WPWrapperNames = []
 
 exports.pluginOptionsSchema = ({ Joi }) => {
   return Joi.object({
-    wrapperName: Joi.string().optional(),
+    wrapperName: Joi.alternatives()
+      .try(Joi.string(), Joi.array().items(Joi.string()))
+      .optional(),
     pluginDirectory: Joi.string().optional(),
     __plugin_uuid: Joi.string().optional(), // for internal use
   })
@@ -48,8 +50,15 @@ exports.onPreBootstrap = async ({ store }, pluginOptions) => {
 
   // Add the wrapper name to the global list
   const { wrapperName = DEFAULT_WRAPPER_NAME } = pluginOptions
-  if (wrapperName && !globalThis.WPWrapperNames.includes(wrapperName)) {
-    globalThis.WPWrapperNames.push(wrapperName)
+  if (wrapperName) {
+    const wrapperNames = Array.isArray(wrapperName)
+      ? wrapperName
+      : [wrapperName]
+    wrapperNames.forEach((name) => {
+      if (!globalThis.WPWrapperNames.includes(name)) {
+        globalThis.WPWrapperNames.push(name)
+      }
+    })
   }
 }
 
@@ -85,8 +94,6 @@ exports.onCreateDevServer = (
   { reporter, store, actions },
   pluginOptions
 ) => {
-  const { wrapperName = DEFAULT_WRAPPER_NAME } = pluginOptions
-
   let updateTimeout = null
   const updatePages = async ({ filterFile = null, filterDir = null }) => {
     clearTimeout(updateTimeout)
@@ -126,21 +133,28 @@ exports.onCreateDevServer = (
 
   // Because wrapper files are no pages,
   // we watch if a wrapper gets deleted from the file system (fs)
-  const watchPath = systemPath.join(
-    pluginOptions.pluginDirectory,
-    '**',
-    pluginOptions.wrapperName
-      ? pluginOptions.wrapperName
-      : DEFAULT_WRAPPER_NAME + '*'
-  )
-  const watcher = chokidar.watch(watchPath, { ignoreInitial: true })
+  const watchPaths = []
+  const wrapperNames = Array.isArray(pluginOptions.wrapperName)
+    ? pluginOptions.wrapperName
+    : [pluginOptions.wrapperName]
+  wrapperNames.forEach((name) => {
+    watchPaths.push(
+      systemPath.join(
+        pluginOptions.pluginDirectory,
+        '**',
+        name ? name : DEFAULT_WRAPPER_NAME + '*'
+      )
+    )
+  })
+
+  const watcher = chokidar.watch(watchPaths, { ignoreInitial: true })
 
   watcher.on('add', (path) => {
     const filterFile = path
     const page = { component: filterFile }
 
     // 1. check first if the new file is a wrapper
-    if (isWrapper({ page, wrapperName })) {
+    if (isWrapper({ page, wrapperName: globalThis.WPWrapperNames })) {
       // 2. we will then filter against directories
       const filterDir = systemPath.dirname(filterFile)
       updatePages({ filterDir })

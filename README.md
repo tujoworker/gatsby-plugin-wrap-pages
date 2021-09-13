@@ -126,7 +126,7 @@ exports.plugins = [
   {
     resolve: 'gatsby-plugin-wrap-pages',
     options: {
-      wrapperName: 'yourWrapperName.tsx',
+      wrapperName: 'yourWrapperName.tsx', // string or array
     },
   },
 ]
