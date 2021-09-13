@@ -67,7 +67,10 @@ exports.onPostBootstrap = async (
   activity.end()
 }
 
-exports.onCreateDevServer = ({ reporter, store, actions }, pluginOptions) => {
+exports.onCreateDevServer = (
+  { reporter, store, actions },
+  pluginOptions
+) => {
   const { wrapperName = null } = pluginOptions
 
   let updateTimeout = null

@@ -1,4 +1,5 @@
 import Joi from 'joi'
+import systemPath from 'path'
 import reporter from 'gatsby-cli/lib/reporter'
 import {
   onCreateWebpackConfig,
@@ -66,7 +67,12 @@ describe('onCreateWebpackConfig', () => {
     expect(setWebpackConfig).toBeCalledWith({
       plugins: [
         {
-          WDE_CACHE_PATH: '"/absolute-root/.cache/wpe-scopes.js"',
+          WDE_CACHE_PATH: JSON.stringify(
+            systemPath.resolve(
+              globalThis.WPProgramDirectory,
+              '.cache/wpe-scopes.js'
+            )
+          ),
         },
       ],
     })

@@ -9,11 +9,13 @@ on:
 jobs:
   build:
     name: Jest tests
-    runs-on: ubuntu-latest
 
     strategy:
       matrix:
+        platform: [ubuntu-latest, macos-latest, windows-latest]
         node-version: [12.x, 14.x, 16.x]
+
+    runs-on: ${{ matrix.platform }}
 
     steps:
       - uses: actions/checkout@v2

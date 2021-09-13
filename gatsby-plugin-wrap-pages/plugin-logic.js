@@ -17,6 +17,7 @@ globalThis.WPScopeFiles = {}
 // Export all so we also can mock them
 exports.handleWrapperScopesAndPages = handleWrapperScopesAndPages
 exports.isWrapper = isWrapper
+exports.convertToForwardslash = convertToForwardslash
 exports.DEFAULT_WRAPPER_NAME = DEFAULT_WRAPPER_NAME
 
 async function handleWrapperScopesAndPages(params) {
@@ -45,7 +46,7 @@ async function collectWrappers({
       page.scopeData = page.scopeData || {}
 
       const componentPath = getPageComponent(page)
-      const relativePath = fixBackslash(
+      const relativePath = convertToForwardslash(
         systemPath.relative(globalThis.WPProgramDirectory, componentPath)
       )
 
@@ -57,7 +58,8 @@ async function collectWrappers({
       page.scopeData.correctedDirectoryPath = systemPath.dirname(
         correctedRelativePath
       )
-      page.scopeData.relativeComponentHash = createContentDigest(relativePath)
+      page.scopeData.relativeComponentHash =
+        createContentDigest(relativePath)
 
       globalThis.WPScopeFiles[page.scopeData.directoryPath] = page
     }
@@ -81,13 +83,15 @@ async function updateContextInPages({
     }
 
     const componentPath = getPageComponent(page)
+
     const dirPath = systemPath.dirname(componentPath)
 
-    const relativeDirectoryPath = systemPath.relative(
-      globalThis.WPProgramDirectory,
-      dirPath
+    const relativeDirectoryPath = convertToForwardslash(
+      systemPath.relative(globalThis.WPProgramDirectory, dirPath)
     )
-    const correctedDirectoryPath = correctRelativePath(relativeDirectoryPath)
+    const correctedDirectoryPath = correctRelativePath(
+      relativeDirectoryPath
+    )
 
     const scopePaths = findValidScopePaths(correctedDirectoryPath)
     const hasScopes = scopePaths.length > 0
@@ -105,7 +109,8 @@ async function updateContextInPages({
           const hash = scope.scopeData.relativeComponentHash
 
           const isSame =
-            correctedDirectoryPath === scope.scopeData.correctedDirectoryPath
+            correctedDirectoryPath ===
+            scope.scopeData.correctedDirectoryPath
           if (isSame) {
             page.context.WPS.push({ hash, isSame })
           } else {
@@ -150,7 +155,9 @@ async function updateContextInPages({
 }
 
 async function writeWrapperImportsCache({ filterDir }) {
-  const cacheFileContent = generateWrappersToImport({ filterDir }).join('\n')
+  const cacheFileContent = generateWrappersToImport({ filterDir }).join(
+    '\n'
+  )
   const scopeFilesHash = createContentDigest(cacheFileContent)
 
   if (scopeFilesHash === globalThis.WPScopeFilesHash) {
@@ -231,7 +238,7 @@ function isWrapper({ page, wrapperName = null }) {
   )
 }
 
-function fixBackslash(path) {
+function convertToForwardslash(path) {
   if (path.includes('\\')) {
     return path.replace(/\\/g, '/')
   }
@@ -250,7 +257,7 @@ function getPageComponent(page) {
 
   // Handle createPage context
   if (page.context && page.context.wrapPageWith) {
-    componentPath = fixBackslash(
+    componentPath = convertToForwardslash(
       systemPath.resolve(
         systemPath.isAbsolute(page.context.wrapPageWith)
           ? '/'

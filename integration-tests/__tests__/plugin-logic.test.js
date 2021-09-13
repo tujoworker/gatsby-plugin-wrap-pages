@@ -1,6 +1,9 @@
 import systemPath from 'path'
 import fs from 'fs-extra'
-import { handleWrapperScopesAndPages } from 'gatsby-plugin-wrap-pages/plugin-logic'
+import {
+  handleWrapperScopesAndPages,
+  convertToForwardslash,
+} from 'gatsby-plugin-wrap-pages/plugin-logic'
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -24,9 +27,8 @@ const getPage = (component = 'src/pages/index.js', merge = null) => [
   'path',
   {
     path: '/path',
-    component: systemPath.resolve(
-      globalThis.WPProgramDirectory.replace(/\\/g, '/'),
-      component
+    component: convertToForwardslash(
+      systemPath.resolve(globalThis.WPProgramDirectory, component)
     ),
     context: {},
     ...merge,
@@ -92,7 +94,10 @@ describe('wrapper', () => {
     )
     expect(fs.writeFile).toHaveBeenCalledTimes(1)
     expect(fs.writeFile).toHaveBeenCalledWith(
-      systemPath.join(globalThis.WPProgramDirectory, '/.cache/wpe-scopes.js'),
+      systemPath.join(
+        globalThis.WPProgramDirectory,
+        '/.cache/wpe-scopes.js'
+      ),
       `export * as _a8e85ae8b0a005f5a28a5cb14cf5a31b from '../src/pages/first-scope/wrap-pages.js';`
     )
   })
@@ -115,7 +120,10 @@ describe('wrapper', () => {
     )
     expect(fs.writeFile).toHaveBeenCalledTimes(1)
     expect(fs.writeFile).toHaveBeenCalledWith(
-      systemPath.join(globalThis.WPProgramDirectory, '/.cache/wpe-scopes.js'),
+      systemPath.join(
+        globalThis.WPProgramDirectory,
+        '/.cache/wpe-scopes.js'
+      ),
       `export * as _04a5fd4a912092212894c198071f22d5 from '../src/pages/first-scope/second-scope/wrap-pages.js';`
     )
   })
@@ -176,7 +184,10 @@ describe('page', () => {
     })
     expect(fs.writeFile).toHaveBeenCalledTimes(1)
     expect(fs.writeFile).toHaveBeenCalledWith(
-      systemPath.join(globalThis.WPProgramDirectory, '/.cache/wpe-scopes.js'),
+      systemPath.join(
+        globalThis.WPProgramDirectory,
+        '/.cache/wpe-scopes.js'
+      ),
       `export * as _de24c938e6d0ae34eea46b0360bc707c from '../src/pages/wrap-pages.js';`
     )
   })
@@ -194,7 +205,10 @@ describe('page', () => {
     expect(pageData.context.WPS[0].isSame).toBe(true)
     expect(fs.writeFile).toHaveBeenCalledTimes(1)
     expect(fs.writeFile).toHaveBeenCalledWith(
-      systemPath.join(globalThis.WPProgramDirectory, '/.cache/wpe-scopes.js'),
+      systemPath.join(
+        globalThis.WPProgramDirectory,
+        '/.cache/wpe-scopes.js'
+      ),
       `export * as _de24c938e6d0ae34eea46b0360bc707c from '../src/pages/wrap-pages.js';`
     )
   })
@@ -218,7 +232,10 @@ describe('page', () => {
     })
     expect(fs.writeFile).toHaveBeenCalledTimes(1)
     expect(fs.writeFile).toHaveBeenCalledWith(
-      systemPath.join(globalThis.WPProgramDirectory, '/.cache/wpe-scopes.js'),
+      systemPath.join(
+        globalThis.WPProgramDirectory,
+        '/.cache/wpe-scopes.js'
+      ),
       `export * as _a8e85ae8b0a005f5a28a5cb14cf5a31b from '../src/pages/first-scope/wrap-pages.js';
 export * as _de24c938e6d0ae34eea46b0360bc707c from '../src/pages/wrap-pages.js';`
     )
@@ -246,7 +263,10 @@ export * as _de24c938e6d0ae34eea46b0360bc707c from '../src/pages/wrap-pages.js';
     })
     expect(fs.writeFile).toHaveBeenCalledTimes(1)
     expect(fs.writeFile).toHaveBeenCalledWith(
-      systemPath.join(globalThis.WPProgramDirectory, '/.cache/wpe-scopes.js'),
+      systemPath.join(
+        globalThis.WPProgramDirectory,
+        '/.cache/wpe-scopes.js'
+      ),
       `export * as _04a5fd4a912092212894c198071f22d5 from '../src/pages/first-scope/second-scope/wrap-pages.js';
 export * as _a8e85ae8b0a005f5a28a5cb14cf5a31b from '../src/pages/first-scope/wrap-pages.js';
 export * as _de24c938e6d0ae34eea46b0360bc707c from '../src/pages/wrap-pages.js';`
@@ -327,5 +347,14 @@ export * as _de24c938e6d0ae34eea46b0360bc707c from '../src/pages/wrap-pages.js';
     expect(pages[4][1].scopeData.relativeComponentHash).toBe(
       pages[3][1].context.WPS[2].hash
     )
+  })
+})
+
+describe('convertToForwardslash', () => {
+  it('should flip backslashes', async () => {
+    const path = 'path-a\\path-b\\path-c'
+    const fixedPath = convertToForwardslash(path)
+
+    expect(fixedPath).toBe('path-a/path-b/path-c')
   })
 })
