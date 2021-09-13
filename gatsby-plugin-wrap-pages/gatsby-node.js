@@ -11,8 +11,7 @@ const { name: pluginName } = require('./package.json')
 
 // Global instances
 globalThis.WPProgramDirectory = null
-globalThis.WPScopeFilesHash = null
-globalThis.WPCoulntPlugin = 0
+globalThis.WPCountPlugins = 0
 globalThis.WPWrapperNames = []
 
 exports.pluginOptionsSchema = ({ Joi }) => {
@@ -31,7 +30,7 @@ exports.onCreateWebpackConfig = ({ actions, plugins }) => {
   actions.setWebpackConfig({
     plugins: [
       plugins.define({
-        WDE_CACHE_PATH: JSON.stringify(cacheFilePath),
+        WP_CACHE_PATH: JSON.stringify(cacheFilePath),
       }),
     ],
   })
@@ -59,12 +58,12 @@ exports.onPostBootstrap = async (
   pluginOptions
 ) => {
   // Count Plugin instances
-  globalThis.WPCoulntPlugin++
+  globalThis.WPCountPlugins++
 
   // Go ahead if we have reached the last one
   // We do this in case this plugin is used within several other themes
   const totalInstances = countAllPluginInstances({ store }, pluginOptions)
-  if (globalThis.WPCoulntPlugin >= totalInstances) {
+  if (globalThis.WPCountPlugins >= totalInstances) {
     const activity = reporter.activityTimer(
       `${chalk.yellowBright(pluginName)} finished`
     )

@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-const WCD_SCOPES = require(WDE_CACHE_PATH)
+const WP_SCOPES = require(WP_CACHE_PATH)
 
 // For each theme/plugin wrapPageElement gets called
 // This basked helps out so we render one scope per page
@@ -12,7 +12,7 @@ export const renewRenderCycle = () => {
 
 export const wrapPageElement = (params) => {
   try {
-    if (WCD_SCOPES) {
+    if (WP_SCOPES) {
       const { WPS } = params.props.pageContext
       if (WPS) {
         for (const { hash, isSame } of WPS) {
@@ -21,7 +21,7 @@ export const wrapPageElement = (params) => {
             // This way we do not wrap several scopes
             scopeBasket[hash] = true
 
-            const scope = WCD_SCOPES[`_${hash}`]
+            const scope = WP_SCOPES[`_${hash}`]
 
             if (scope) {
               let name = null

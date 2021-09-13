@@ -13,6 +13,7 @@ const DEFAULT_WRAPPER_NAME = 'wrap-pages'
 
 // Containers
 globalThis.WPScopeFiles = {}
+globalThis.WPScopeFilesHash = null
 
 // Export all so we also can mock them
 exports.handleWrapperScopesAndPages = handleWrapperScopesAndPages
@@ -76,8 +77,8 @@ async function updateContextInPages({
     const page = p[1]
 
     if (
-      isWrapper({ page, wrapperName }) ||
-      skipThisPage({ page, filterFile, filterDir })
+      skipThisPage({ page, filterFile, filterDir }) ||
+      isWrapper({ page, wrapperName })
     ) {
       continue
     }

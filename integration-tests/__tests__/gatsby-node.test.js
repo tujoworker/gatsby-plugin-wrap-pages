@@ -19,7 +19,7 @@ jest.mock('gatsby-plugin-wrap-pages/plugin-logic', () => ({
 
 beforeEach(() => {
   jest.resetAllMocks()
-  globalThis.WPCoulntPlugin = 1
+  globalThis.WPCountPlugins = 1
   globalThis.WPWrapperNames = []
   globalThis.WPProgramDirectory = null
 })
@@ -70,7 +70,7 @@ describe('onCreateWebpackConfig', () => {
     expect(setWebpackConfig).toBeCalledWith({
       plugins: [
         {
-          WDE_CACHE_PATH: JSON.stringify(
+          WP_CACHE_PATH: JSON.stringify(
             systemPath.resolve(
               globalThis.WPProgramDirectory,
               '.cache/wpe-scopes.js'
@@ -142,11 +142,11 @@ describe('onPostBootstrap', () => {
   const pluginOptions = {}
 
   it('should count the plugin instance', async () => {
-    expect(globalThis.WPCoulntPlugin).toBe(1)
+    expect(globalThis.WPCountPlugins).toBe(1)
     await onPostBootstrap(getConfig(), pluginOptions)
-    expect(globalThis.WPCoulntPlugin).toBe(2)
+    expect(globalThis.WPCountPlugins).toBe(2)
     await onPostBootstrap(getConfig(), pluginOptions)
-    expect(globalThis.WPCoulntPlugin).toBe(3)
+    expect(globalThis.WPCountPlugins).toBe(3)
   })
 
   it('should call handleWrapperScopesAndPages', async () => {
@@ -171,7 +171,7 @@ describe('onPostBootstrap', () => {
   })
 
   it('should not call handleWrapperScopesAndPages when count has not reached the total', async () => {
-    globalThis.WPCoulntPlugin = -1
+    globalThis.WPCountPlugins = -1
     const pluginOptions = {}
     await onPostBootstrap(getConfig(), pluginOptions)
     expect(handleWrapperScopesAndPages).toBeCalledTimes(0)

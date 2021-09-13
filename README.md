@@ -185,6 +185,22 @@ This description is simplified and the order of all the steps is not 100% as des
 
 6. The plugin uses Gatsby's API `wrapPageElement` and checks if a matching _hash_ is in the current page context.
 
+### WP_CACHE_PATH
+
+During the Gatsby compilation, Webpack sets `WP_CACHE_PATH` with the Define Plugin.
+
+While `wrap-pages.js` is using this to locate the currently used cache file (`.cache/wpe-scopes.js`) which includes all imports pointing to your wrappers.
+
+When testing `wrap-pages.js` with Jest, we have to provide the `WP_CACHE_PATH` by setting this in the jest.config:
+
+```js
+// jest.config.js
+...
+globals: {
+  WP_CACHE_PATH: require.resolve('./__mocks__/.cache/wpe-scopes.js'),
+}
+```
+
 ### Why use onCreateDevServer?
 
 Now, things would have been very much easier, if this plugin not would support development mode, with support for resolving file changes on the disk on the fly.
