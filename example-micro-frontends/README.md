@@ -6,6 +6,8 @@ But the only piece missing is to easily customize what layout and what data prov
 
 Now, **gatsby-plugin-wrap-pages** can be included by every "mirco app" independently. They even can define what they want to call the wrapper files (`wrapperName`) by itself. Or if that matters, it can be used just by one micro app – even if the root application is not aware of this plugin.
 
+Live [Demo](https://tujoworker.github.io/gatsby-plugin-wrap-pages/example-micro-frontends/) 🚀 provided by the [example code](https://github.com/tujoworker/gatsby-plugin-wrap-pages/tree/main/example-micro-frontends).
+
 ## How it works
 
 It uses a main application (root application) to bundle the whole application, which includes the micro applications as Gatsby Themes.
