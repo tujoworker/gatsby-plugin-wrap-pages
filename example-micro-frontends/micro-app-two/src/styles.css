@@ -1,0 +1,32 @@
+body {
+  margin: 0;
+
+  font-family: sans-serif;
+}
+
+header,
+main {
+  font-size: 140%;
+}
+
+html,
+body,
+main,
+main > div,
+#___gatsby,
+#gatsby-focus-wrapper {
+  height: 100%;
+}
+
+a {
+  color: black;
+}
+
+header {
+  padding: 0.5rem;
+  background-color: black;
+  color: white;
+}
+header a {
+  color: white;
+}

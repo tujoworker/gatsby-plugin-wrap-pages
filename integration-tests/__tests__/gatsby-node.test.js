@@ -1,6 +1,9 @@
 import Joi from 'joi'
+import systemPath from 'path'
+import reporter from 'gatsby-cli/lib/reporter'
 import {
   onCreateWebpackConfig,
+  onPreBootstrap,
   onPostBootstrap,
   pluginOptionsSchema,
 } from 'gatsby-plugin-wrap-pages/gatsby-node'
@@ -16,7 +19,9 @@ jest.mock('gatsby-plugin-wrap-pages/plugin-logic', () => ({
 
 beforeEach(() => {
   jest.resetAllMocks()
-  globalThis.directoryRoot = null
+  globalThis.WPCountPlugins = 1
+  globalThis.WPWrapperNames = []
+  globalThis.WPProgramDirectory = null
 })
 
 describe('pluginOptionsSchema', () => {
@@ -31,7 +36,9 @@ describe('pluginOptionsSchema', () => {
     const schema = pluginOptionsSchema({ Joi })
     const config = { wrapperName: 123 }
     const result = schema.validate(config)
-    expect(result.error.message).toBe('"wrapperName" must be a string')
+    expect(result.error.message).toBe(
+      '"wrapperName" must be one of [string, array]'
+    )
   })
 })
 
@@ -59,40 +66,89 @@ describe('onCreateWebpackConfig', () => {
 
     const pluginOptions = {} // wrapperName
 
-    globalThis.directoryRoot = '/absolute-root'
+    globalThis.WPProgramDirectory = '/absolute-root'
     onCreateWebpackConfig(getConfig(), pluginOptions)
 
     expect(setWebpackConfig).toBeCalledWith({
       plugins: [
         {
-          WDE_CACHE_PATH: '"/absolute-root/.cache/wpe-scopes.js"',
+          WP_CACHE_PATH: JSON.stringify(
+            systemPath.resolve(
+              globalThis.WPProgramDirectory,
+              '.cache/wpe-scopes.js'
+            )
+          ),
         },
       ],
     })
   })
 })
 
-describe('onPostBootstrap', () => {
-  const directory = '/absolute-root'
-  const getConfig = (merge = null) => ({
-    ...{
-      actions: {},
-      store: {
-        getState: () => ({
-          pages: [],
-          program: { directory },
-        }),
-      },
+const directory = '/absolute-root'
+const config = Object.freeze({
+  plugins: [
+    {
+      resolve: 'gatsby-plugin-wrap-pages',
+      options: { __plugin_uuid: 1 },
+      parentDir: directory,
     },
-    ...merge,
-  })
+  ],
+})
+const getConfig = (merge = null) => ({
+  ...{
+    actions: {},
+    reporter,
+    store: {
+      getState: () => ({
+        config,
+        pages: [],
+        program: { directory },
+      }),
+    },
+  },
+  ...merge,
+})
 
+describe('onPreBootstrap', () => {
   const pluginOptions = {}
 
   it('should set directoryRoot', async () => {
-    expect(globalThis.directoryRoot).toBe(null)
+    expect(globalThis.WPProgramDirectory).toBe(null)
+    await onPreBootstrap(getConfig(), pluginOptions)
+    expect(globalThis.WPProgramDirectory).toBe(directory)
+  })
+
+  it('should set pluginDirectory', async () => {
+    pluginOptions.__plugin_uuid = 1
+    expect(pluginOptions.pluginDirectory).toBe(undefined)
+    await onPreBootstrap(getConfig(), pluginOptions)
+    expect(pluginOptions.pluginDirectory).toBe(directory)
+  })
+
+  it('should add wrapperName to the global WPWrapperNames', async () => {
+    const pluginOptions = { wrapperName: 'layout.tsx' }
+    expect(globalThis.WPWrapperNames).toHaveLength(0)
+
+    await onPreBootstrap(getConfig(), pluginOptions)
+    expect(globalThis.WPWrapperNames).toHaveLength(1)
+
+    // Second try
+    await onPreBootstrap(getConfig(), pluginOptions)
+    expect(globalThis.WPWrapperNames).toHaveLength(1)
+
+    expect(globalThis.WPWrapperNames).toContain('layout.tsx')
+  })
+})
+
+describe('onPostBootstrap', () => {
+  const pluginOptions = {}
+
+  it('should count the plugin instance', async () => {
+    expect(globalThis.WPCountPlugins).toBe(1)
     await onPostBootstrap(getConfig(), pluginOptions)
-    expect(globalThis.directoryRoot).toBe(directory)
+    expect(globalThis.WPCountPlugins).toBe(2)
+    await onPostBootstrap(getConfig(), pluginOptions)
+    expect(globalThis.WPCountPlugins).toBe(3)
   })
 
   it('should call handleWrapperScopesAndPages', async () => {
@@ -101,7 +157,25 @@ describe('onPostBootstrap', () => {
     expect(handleWrapperScopesAndPages).toHaveBeenCalledWith({
       actions: {},
       pages: [],
-      wrapperName: null,
+      wrapperName: [],
     })
+  })
+
+  it('should call handleWrapperScopesAndPages with custom wrapperName', async () => {
+    const pluginOptions = { wrapperName: 'layout.tsx' }
+    await onPreBootstrap(getConfig(), pluginOptions)
+    await onPostBootstrap(getConfig(), pluginOptions)
+    expect(handleWrapperScopesAndPages).toHaveBeenCalledWith({
+      actions: {},
+      pages: [],
+      wrapperName: ['layout.tsx'],
+    })
+  })
+
+  it('should not call handleWrapperScopesAndPages when count has not reached the total', async () => {
+    globalThis.WPCountPlugins = -1
+    const pluginOptions = {}
+    await onPostBootstrap(getConfig(), pluginOptions)
+    expect(handleWrapperScopesAndPages).toBeCalledTimes(0)
   })
 })

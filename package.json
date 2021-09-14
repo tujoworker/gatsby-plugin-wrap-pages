@@ -1,8 +1,8 @@
 {
   "name": "wrap-pages-monorepo",
   "workspaces": [
-    "example",
-    "example-layout",
+    "example-basic",
+    "example-micro-frontends/*",
     "integration-tests",
     "gatsby-plugin-wrap-pages"
   ],
@@ -11,10 +11,10 @@
   "author": "Tobias Høegh",
   "version": "0.0.0",
   "scripts": {
-    "start": "yarn workspace example start",
-    "build": "yarn workspace example build",
-    "serve": "yarn workspace example serve",
-    "clean": "yarn workspace example clean",
+    "start": "yarn workspace example-basic start",
+    "build": "yarn workspace example-basic build",
+    "serve": "yarn workspace example-basic serve",
+    "clean": "yarn workspace example-basic clean",
     "test": "yarn workspace integration-tests test",
     "test:cypress": "yarn workspace integration-tests test:cypress",
     "test:cypress:ci": "yarn workspace integration-tests test:cypress:ci",

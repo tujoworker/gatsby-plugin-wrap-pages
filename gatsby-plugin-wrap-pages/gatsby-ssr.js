@@ -1,1 +1,5 @@
-export { wrapPageElement } from './wrap-pages'
+import { wrapPageElement, renewRenderCycle } from './wrap-pages'
+
+const onRenderBody = renewRenderCycle
+
+export { wrapPageElement, onRenderBody }

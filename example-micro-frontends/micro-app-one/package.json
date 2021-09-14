@@ -1,0 +1,19 @@
+{
+  "name": "@micro-app/one",
+  "private": true,
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "Tobias Høegh",
+  "scripts": {
+    "start": "gatsby develop --port=8090",
+    "build": "gatsby build",
+    "serve": "gatsby serve --port=9090",
+    "clean": "gatsby clean"
+  },
+  "dependencies": {
+    "gatsby": "^3.13.0",
+    "gatsby-plugin-wrap-pages": "workspace:*",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  }
+}

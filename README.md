@@ -6,17 +6,16 @@ With this plugin you can add (nested) wrappers inside the pages directory. It wi
 my-project/
 ├── src/
 │   └── pages/
-│       ├── wrap-pages.js // ← wrapPagesDeep()
+│       ├── wrap-pages.tsx // ← wrapPagesDeep(<Layout>)
+│       ├── index.tsx
 │       └── your-path/
-│           ├── wrap-pages.js // ← wrapPages()
-│           ├── index.js
-│           ├── foo.js
-│           ├── …
+│           ├── wrap-pages.tsx // ← wrapPagesDeep(<Layout>)
+│           ├── index.tsx
+│           ├── … // more pages
 │           └── more-nested-paths/
-│               ├── wrap-pages.js // ← wrapPages()
+│               ├── wrap-pages.js // ← wrapPages(<Provider>)
 │               ├── index.js
-│               ├── bar.js
-│               └── …
+│               └── … // more pages
 ├── package.json
 └── gatsby-config.json
 ```
@@ -25,18 +24,17 @@ Why? Everything is possible with vanilla Gatsby – what this Plugin offers, is 
 
 It supports:
 
-- TypeScript
-- Gatsby Themes and Plugins
-- Gatsby Plugins used as [Micro Frontends](https://www.youtube.com/watch?v=0Ta-awtLZTs)
 - SSR (SSG) and client-side rendering with the same wrapper
 - Wrap your pages with HTML Elements, React Components or Providers
 - Wrap pages in current directory
 - Wrap pages deep (nested)
 - Nested wrappers
+- Gatsby Themes and Plugins
+- Gatsby Plugins used as [Micro Frontends](#micro-frontends)
 - Programmatically created pages
 - Custom name of the wrapper file
 
-Live [Demo](https://gatsby-plugin-wrap-pages.netlify.app/) 🚀 provided by the [example code](https://github.com/tujoworker/gatsby-plugin-wrap-pages/tree/main/example).
+Live [Demo](https://tujoworker.github.io/gatsby-plugin-wrap-pages/) 🚀 provided by the [example code](https://github.com/tujoworker/gatsby-plugin-wrap-pages/tree/main/example-basic).
 
 ## How to use
 
@@ -126,10 +124,45 @@ exports.plugins = [
   {
     resolve: 'gatsby-plugin-wrap-pages',
     options: {
-      wrapperName: 'yourWrapperName.tsx',
+      wrapperName: 'yourWrapperName.tsx', // string or array
     },
   },
 ]
+```
+
+## Micro Frontends
+
+Gatsby can be used to build UX focused micro frontends, where everything is page based and optimized for a fantastic user and a11y experience – while still deliver micro frontend independence in terms of DX and dedicated developer teams.
+
+But the only piece missing is to easily customize what layout and what data provider is used by every micro application.
+
+Now, **gatsby-plugin-wrap-pages** can be included by every "mirco app" independently. They even can define what they want to call the wrapper files (`wrapperName`) by itself. Or if that matters, it can be used just by one micro app – even if the root application is not aware of this plugin.
+
+There is an [example setup](https://github.com/tujoworker/gatsby-plugin-wrap-pages/example-micro-frontends) in this repo.
+
+Example structure:
+
+```js
+micro-app-a/
+├── src/
+│   └── pages/
+│       └── micro-app-a/
+│           ├── wrap-pages.tsx // ← will wrap everything inside this directory
+│           ├── index.tsx
+│           └── … // more pages and nested routes
+micro-app-b/
+├── src/
+│   └── pages/
+│       └── micro-app-b/
+│           ├── wrap-pages.tsx // ← will wrap everything inside this directory
+│           ├── index.tsx
+│           └── … // more pages and nested routes
+main-application/
+├── src/
+│   └── pages/
+│       └── wrap-pages.tsx // ← wrapPagesDeep(<MainLayout>)
+├── package.json
+└── gatsby-config.json
 ```
 
 ## Programmatically created pages
@@ -185,6 +218,22 @@ This description is simplified and the order of all the steps is not 100% as des
 
 6. The plugin uses Gatsby's API `wrapPageElement` and checks if a matching _hash_ is in the current page context.
 
+### WP_CACHE_PATH
+
+During the Gatsby compilation, Webpack sets `WP_CACHE_PATH` with the Define Plugin.
+
+While `wrap-pages.js` is using this to locate the currently used cache file (`.cache/wpe-scopes.js`) which includes all imports pointing to your wrappers.
+
+When testing `wrap-pages.js` with Jest, we have to provide the `WP_CACHE_PATH` by setting this in the jest.config:
+
+```js
+// jest.config.js
+...
+globals: {
+  WP_CACHE_PATH: require.resolve('./__mocks__/.cache/wpe-scopes.js'),
+}
+```
+
 ### Why use onCreateDevServer?
 
 Now, things would have been very much easier, if this plugin not would support development mode, with support for resolving file changes on the disk on the fly.
@@ -194,3 +243,13 @@ The Gatsby `onCreateDevServer` is the last one during warm up, so we add our fil
 We listen for `CREATE_PAGE` to update everything related, both when a page gets created or a new wrapper file gets created.
 
 We also listen for `unlink` so we can update related pages when a wrapper gets deleted.
+
+### Development
+
+To test the add and remove cycle, run:
+
+1. $ `git checkout -- example-micro-frontends/micro-app-home/src/pages/home-layout.tsx`
+
+2. $ `unlink example-micro-frontends/micro-app-home/src/pages/home-layout.tsx`
+
+3. And repeat. Eventually refresh the browser.

@@ -1,4 +1,8 @@
-describe('Page', () => {
+Cypress.config({
+  baseUrl: 'http://localhost:9091/',
+})
+
+describe('example-basic', () => {
   it('root page has header with repo link', () => {
     cy.visit('/')
     cy.get('header').contains('Repo')

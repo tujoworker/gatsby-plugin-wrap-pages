@@ -1,23 +1,30 @@
 const systemPath = require('path')
 const fs = require('fs-extra')
 const { createContentDigest } = require('gatsby-core-utils')
-const { pageDataExists, writePageData } = require('gatsby/dist/utils/page-data')
+const {
+  pageDataExists,
+  writePageData,
+  readPageQueryResult,
+  savePageQueryResult,
+} = require('gatsby/dist/utils/page-data')
 
 // Constants
 const DEFAULT_WRAPPER_NAME = 'wrap-pages'
 
 // Containers
-globalThis.globalScopeFiles = {}
+globalThis.WPScopeFiles = {}
+globalThis.WPScopeFilesHash = null
 
 // Export all so we also can mock them
 exports.handleWrapperScopesAndPages = handleWrapperScopesAndPages
 exports.isWrapper = isWrapper
+exports.convertToForwardslash = convertToForwardslash
 exports.DEFAULT_WRAPPER_NAME = DEFAULT_WRAPPER_NAME
 
 async function handleWrapperScopesAndPages(params) {
   await collectWrappers(params)
-  await updateContextInPages(params)
   await writeWrapperImportsCache(params)
+  await updateContextInPages(params)
 }
 
 async function collectWrappers({
@@ -37,17 +44,25 @@ async function collectWrappers({
     if (isWrapper({ page, wrapperName })) {
       actions.deletePage(page)
 
-      const componentPath = getPageComponent(page)
       page.scopeData = page.scopeData || {}
-      page.scopeData.relativeComponentPath = fixBackslash(
-        systemPath.relative(globalThis.directoryRoot, componentPath)
-      )
-      page.scopeData.relativeComponentHash = createContentDigest(
-        page.scopeData.relativeComponentPath
+
+      const componentPath = getPageComponent(page)
+      const relativePath = convertToForwardslash(
+        systemPath.relative(globalThis.WPProgramDirectory, componentPath)
       )
 
-      const dirPath = systemPath.dirname(componentPath)
-      globalThis.globalScopeFiles[dirPath] = page
+      // Correct plugin in plugin situation
+      const correctedRelativePath = correctRelativePath(relativePath)
+
+      page.scopeData.relativeComponentPath = relativePath
+      page.scopeData.directoryPath = systemPath.dirname(relativePath)
+      page.scopeData.correctedDirectoryPath = systemPath.dirname(
+        correctedRelativePath
+      )
+      page.scopeData.relativeComponentHash =
+        createContentDigest(relativePath)
+
+      globalThis.WPScopeFiles[page.scopeData.directoryPath] = page
     }
   }
 }
@@ -62,14 +77,24 @@ async function updateContextInPages({
     const page = p[1]
 
     if (
-      isWrapper({ page, wrapperName }) ||
-      skipThisPage({ page, filterFile, filterDir })
+      skipThisPage({ page, filterFile, filterDir }) ||
+      isWrapper({ page, wrapperName })
     ) {
       continue
     }
 
-    const dirPath = systemPath.dirname(getPageComponent(page))
-    const scopePaths = findValidScopePaths(dirPath)
+    const componentPath = getPageComponent(page)
+
+    const dirPath = systemPath.dirname(componentPath)
+
+    const relativeDirectoryPath = convertToForwardslash(
+      systemPath.relative(globalThis.WPProgramDirectory, dirPath)
+    )
+    const correctedDirectoryPath = correctRelativePath(
+      relativeDirectoryPath
+    )
+
+    const scopePaths = findValidScopePaths(correctedDirectoryPath)
     const hasScopes = scopePaths.length > 0
 
     if (!hasScopes && page.context.WPS) {
@@ -80,10 +105,13 @@ async function updateContextInPages({
       page.context.WPS = []
 
       for (const scopePath of scopePaths) {
-        if (globalThis.globalScopeFiles[scopePath]) {
-          const { relativeComponentHash: hash } =
-            globalThis.globalScopeFiles[scopePath].scopeData
-          const isSame = dirPath === scopePath
+        const scope = globalThis.WPScopeFiles[scopePath]
+        if (scope) {
+          const hash = scope.scopeData.relativeComponentHash
+
+          const isSame =
+            correctedDirectoryPath ===
+            scope.scopeData.correctedDirectoryPath
           if (isSame) {
             page.context.WPS.push({ hash, isSame })
           } else {
@@ -92,33 +120,35 @@ async function updateContextInPages({
         }
       }
 
-      if (filterDir || filterDir) {
-        const publicDir = systemPath.join(globalThis.directoryRoot, 'public')
+      if (filterFile || filterDir) {
+        const publicDir = systemPath.join(
+          globalThis.WPProgramDirectory,
+          'public'
+        )
 
         if (pageDataExists(publicDir, page.path)) {
-          // This is how Gatsby core finds the path to the cached page context data
-          const inputFilePath = systemPath.join(
-            publicDir,
-            '..',
-            '.cache',
-            'json',
-            `${page.path.replace(/\//g, '_')}.json`
+          // 1. Read page context
+          const result = JSON.parse(
+            await readPageQueryResult(publicDir, page.path)
           )
 
-          if (fs.existsSync(inputFilePath)) {
-            const result = await fs.readJSON(inputFilePath)
-            Object.assign(result.pageContext, page.context)
+          // 2. Update the page context
+          result.pageContext.WPS = page.context.WPS
 
-            // 1. update the cache with the new page context data
-            await fs.writeJSON(inputFilePath, result)
+          // 3. write the page context to the cache
+          await savePageQueryResult(
+            globalThis.WPProgramDirectory,
+            page.path,
+            JSON.stringify(result)
+          )
 
-            // 2. update the real page context data for the effected page
-            await writePageData(publicDir, page)
-          } else {
-            console.warn(
-              `Could not update the page context for "${page.path}" because the pageContext data did not exists in the cache: ${inputFilePath}`
-            )
+          // Ensure the page has at least an empty staticQueryHashes array
+          if (!page.staticQueryHashes) {
+            page.staticQueryHashes = []
           }
+
+          // 4. update the real page context data for the effected page
+          await writePageData(publicDir, page)
         }
       }
     }
@@ -126,102 +156,71 @@ async function updateContextInPages({
 }
 
 async function writeWrapperImportsCache({ filterDir }) {
-  const cacheFileContent = generateWrappersToImport({ filterDir })
+  const cacheFileContent = generateWrappersToImport({ filterDir }).join(
+    '\n'
+  )
   const scopeFilesHash = createContentDigest(cacheFileContent)
 
-  if (scopeFilesHash !== globalThis.scopeFilesHash) {
-    globalThis.scopeFilesHash = scopeFilesHash
-
-    const cacheFilePath = systemPath.resolve(
-      globalThis.directoryRoot,
-      '.cache/wpe-scopes.js'
-    )
-
-    const writeCacheToDisk = () => {
-      fs.writeFile(cacheFilePath, cacheFileContent.join('\n'))
-
-      /*
-      Also, when we use "writing to disk" without a delay, 
-		  we get this warning:
-		  
-		  warn Warning: Event "xstate.after(200)#waitingMachine.ag
-		  gregatingFileChanges" was sent to stopped service
-		  "waitingMachine". This service has already reached its
-		  final state, and will not transition.
-		  Event: {"type":"xstate.after(200)#waitingMachine.aggrega
-		  tingFileChanges"}
-      */
-    }
-
-    if (globalThis.writeTimeoutDelay === 0) {
-      writeCacheToDisk()
-    } else {
-      // Delay the write process,
-      // if do not delay it, unresolved modules will block future Gatsby activity
-      clearTimeout(globalThis.writeTimeout)
-      globalThis.writeTimeout = setTimeout(
-        writeCacheToDisk,
-        globalThis.writeTimeoutDelay || 1e3
-      )
-    }
+  if (scopeFilesHash === globalThis.WPScopeFilesHash) {
+    return // write only once to the file
   }
+  globalThis.WPScopeFilesHash = scopeFilesHash
+
+  const cacheFilePath = systemPath.resolve(
+    globalThis.WPProgramDirectory,
+    '.cache/wpe-scopes.js'
+  )
+
+  await fs.writeFile(cacheFilePath, cacheFileContent)
 }
 
 function generateWrappersToImport({ filterDir }) {
   const result = []
-  for (let dirPath in globalThis.globalScopeFiles) {
-    const scope = globalThis.globalScopeFiles[dirPath]
+  for (let scopePath in globalThis.WPScopeFiles) {
+    const scope = globalThis.WPScopeFiles[scopePath]
+
     if (filterDir) {
       if (!fs.existsSync(scope.component)) {
-        delete globalThis.globalScopeFiles[dirPath]
+        delete globalThis.WPScopeFiles[scopePath]
         continue
       }
     }
 
     result.push(
       `export * as _${scope.scopeData.relativeComponentHash} from '../${scope.scopeData.relativeComponentPath}';`
-      // ensure we always use a forwards slash when creating relative paths
     )
   }
-
-  // NB: can probably be removed as this does not help for the "first save" issue
-  // result.push('\ndelete require.cache[__filename]')
 
   return result
 }
 
 function findValidScopePaths(componentDir) {
   const result = []
-  const parts = componentDir.split('/')
-  const directoryRoot = globalThis.directoryRoot
 
-  // eslint-disable-next-line
-  for (const i of parts) {
-    const possibleScope = parts.join('/')
-
-    if (globalThis.globalScopeFiles[possibleScope]) {
-      result.push(possibleScope)
-    }
-
-    // Bail out once we have reached the Gatsby instance root
-    if (possibleScope === directoryRoot) {
-      break
-    }
-
-    parts.pop()
+  if (componentDir === '.cache') {
+    return result
   }
 
-  return result
+  // eslint-disable-next-line
+  for (const scopePath in globalThis.WPScopeFiles) {
+    const scope = globalThis.WPScopeFiles[scopePath]
+    if (componentDir.startsWith(scope.scopeData.correctedDirectoryPath)) {
+      result.push(scopePath)
+    }
+  }
+
+  // return result.reverse()// will this be correct as well?
+  return result.sort((a, b) => (a.length > b.length ? -1 : 1))
 }
 
 function skipThisPage({ page, filterFile, filterDir }) {
-  const componentPath = getPageComponent(page)
-  if (filterFile && componentPath !== filterFile) {
+  const filePath = getPageComponent(page)
+  // console.log('skipThisPage', { filePath, filterFile })
+  if (filterFile && filePath !== filterFile) {
     return true
   }
 
-  const dirPath = systemPath.dirname(componentPath)
-
+  const dirPath = systemPath.dirname(filePath)
   if (filterDir && !dirPath.includes(filterDir)) {
     return true
   }
@@ -230,13 +229,33 @@ function skipThisPage({ page, filterFile, filterDir }) {
 }
 
 function isWrapper({ page, wrapperName = null }) {
-  return getPageComponent(page).includes(
-    '/' + (wrapperName || DEFAULT_WRAPPER_NAME)
-  )
+  if (!wrapperName) {
+    wrapperName = DEFAULT_WRAPPER_NAME
+  }
+
+  if (typeof wrapperName === 'string') {
+    wrapperName = [wrapperName]
+  }
+
+  const path = getPageComponent(page)
+
+  return wrapperName.some((name) => {
+    return path.includes('/' + name)
+  })
 }
 
-function fixBackslash(path) {
-  return path.includes('\\') ? path.replace(/\\/g, '/') : path
+function convertToForwardslash(path) {
+  if (path.includes('\\')) {
+    return path.replace(/\\/g, '/')
+  }
+  return path
+}
+
+function correctRelativePath(path) {
+  if (path.startsWith('../')) {
+    return path.substr(path.indexOf('/src/') + 1)
+  }
+  return path
 }
 
 function getPageComponent(page) {
@@ -244,11 +263,11 @@ function getPageComponent(page) {
 
   // Handle createPage context
   if (page.context && page.context.wrapPageWith) {
-    componentPath = fixBackslash(
+    componentPath = convertToForwardslash(
       systemPath.resolve(
         systemPath.isAbsolute(page.context.wrapPageWith)
           ? '/'
-          : globalThis.directoryRoot,
+          : globalThis.WPProgramDirectory,
         systemPath.resolve(page.context.wrapPageWith),
         systemPath.basename(componentPath)
       )

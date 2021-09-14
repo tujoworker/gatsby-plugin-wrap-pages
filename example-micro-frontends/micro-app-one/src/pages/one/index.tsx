@@ -10,8 +10,12 @@ export default function Page(props: PageProps) {
         padding: '1rem',
       }}
     >
-      <p>This page is wrapped with the main wrapper.</p>
-      <Link to="/dashboard/2">Go to a dynamic page</Link>
+      <h1>@micro-app/one</h1>
+      <p>
+        This page is wrapped with both the main wrapper and a wrapper
+        inside this micro app.
+      </p>
+      <Link to="/">Go home</Link>
     </div>
   )
 }

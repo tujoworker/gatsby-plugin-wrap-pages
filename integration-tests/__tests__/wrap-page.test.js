@@ -1,6 +1,9 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import { wrapPageElement } from 'gatsby-plugin-wrap-pages/wrap-pages'
+import {
+  wrapPageElement,
+  renewRenderCycle,
+} from 'gatsby-plugin-wrap-pages/wrap-pages'
 import * as mainScopeWrapper from '../__mocks__/src/pages/wrap-pages'
 import * as firstScopeWrapper from '../__mocks__/src/pages/first-scope/wrap-pages'
 import * as secondScopeWrapper from '../__mocks__/src/pages/first-scope/second-scope/wrap-pages'
@@ -10,6 +13,7 @@ const Page = () => {
 }
 
 beforeEach(() => {
+  renewRenderCycle()
   jest.restoreAllMocks()
 })
 

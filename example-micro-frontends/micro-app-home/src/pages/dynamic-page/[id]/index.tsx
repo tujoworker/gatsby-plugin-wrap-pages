@@ -10,6 +10,7 @@ export default function Page(props: PageProps) {
         padding: '1rem',
       }}
     >
+      <h1>dynamic page</h1>
       <p>This page is wrapped in an additional layout wrapper</p>
       <p>Dynamic Page: "{props.id}"</p>
       <Link to="/">Go home again</Link>
