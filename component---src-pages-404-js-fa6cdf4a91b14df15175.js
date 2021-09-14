@@ -1,0 +1,2 @@
+(self.webpackChunkexample_basic=self.webpackChunkexample_basic||[]).push([[883],{7297:function(e,n,t){"use strict";t.r(n),t.d(n,{default:function(){return a}});var u=t(3289);function a(){return u.createElement(u.Fragment,null,"404")}}}]);
+//# sourceMappingURL=component---src-pages-404-js-fa6cdf4a91b14df15175.js.map

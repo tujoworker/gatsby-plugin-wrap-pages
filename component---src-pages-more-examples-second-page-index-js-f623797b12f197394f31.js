@@ -1,0 +1,2 @@
+(self.webpackChunkexample_basic=self.webpackChunkexample_basic||[]).push([[539],{7873:function(e,t,n){"use strict";n.r(t),n.d(t,{default:function(){return l}});var a=n(3289),r=n(2244);function l(){return a.createElement(a.Fragment,null,a.createElement("p",null,"This page is wrapped with ",a.createElement("b",null,"two")," wrappers."),a.createElement(r.rU,{to:"/more-examples/second-page/third-page"},"One more?"))}}}]);
+//# sourceMappingURL=component---src-pages-more-examples-second-page-index-js-f623797b12f197394f31.js.map

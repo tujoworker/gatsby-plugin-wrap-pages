@@ -1,0 +1,2 @@
+(self.webpackChunkexample_basic=self.webpackChunkexample_basic||[]).push([[938],{7628:function(e,t,a){"use strict";a.r(t),a.d(t,{default:function(){return s}});var n=a(3289),r=a(2244);function s(){return n.createElement(n.Fragment,null,n.createElement("p",null,"This page is also wrapped."),n.createElement(r.rU,{to:"/sub-page/nested-routes"},"Visit a nested (deep) wrapped page"))}}}]);
+//# sourceMappingURL=component---src-pages-sub-page-second-page-js-681bb8b6eb59ee8c90c6.js.map

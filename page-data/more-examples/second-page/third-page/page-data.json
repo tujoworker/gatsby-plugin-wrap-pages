@@ -1,0 +1,5 @@
+{
+    "componentChunkName": "component---src-templates-page-component-js",
+    "path": "/more-examples/second-page/third-page",
+    "result": {"pageContext":{"wrapPageWith":"./src/pages/more-examples/second-page/third-page/","WPS":[{"hash":"437ff3061f675df450a900f66d8cf5c1","isSame":true},{"hash":"26243a013ca7d319d87081f9768dd680"},{"hash":"455a0f696332624bb2ff3f910434400d"},{"hash":"de24c938e6d0ae34eea46b0360bc707c"}]}},
+    "staticQueryHashes": []}

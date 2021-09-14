@@ -1,0 +1,2 @@
+(self.webpackChunkexample_basic=self.webpackChunkexample_basic||[]).push([[536],{302:function(e,n,t){"use strict";t.r(n),t.d(n,{default:function(){return r}});var a=t(3289),l=t(2244);function r(){return a.createElement(a.Fragment,null,a.createElement("p",null,"This page is wrapped."),a.createElement(l.rU,{to:"/sub-page/second-page"},"Also this one"))}}}]);
+//# sourceMappingURL=component---src-pages-sub-page-index-js-59931b8a8ca70d5e254f.js.map

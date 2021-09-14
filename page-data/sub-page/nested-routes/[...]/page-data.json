@@ -1,0 +1,6 @@
+{
+    "componentChunkName": "component---src-pages-sub-page-nested-routes-js",
+    "path": "/sub-page/nested-routes/[...]/",
+    "result": {"pageContext":{"matchPath":"/sub-page/nested-routes/*","WPS":[{"hash":"fb36a712329d0075729eefad81effba4"},{"hash":"de24c938e6d0ae34eea46b0360bc707c"}]}},
+    "staticQueryHashes": [],
+    "matchPath": "/sub-page/nested-routes/*"}
