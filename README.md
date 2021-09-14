@@ -6,17 +6,16 @@ With this plugin you can add (nested) wrappers inside the pages directory. It wi
 my-project/
 ├── src/
 │   └── pages/
-│       ├── wrap-pages.js // ← wrapPagesDeep()
+│       ├── wrap-pages.tsx // ← wrapPagesDeep(<Layout>)
+│       ├── index.tsx
 │       └── your-path/
-│           ├── wrap-pages.js // ← wrapPages()
-│           ├── index.js
-│           ├── foo.js
-│           ├── …
+│           ├── wrap-pages.tsx // ← wrapPagesDeep(<Layout>)
+│           ├── index.tsx
+│           ├── … // more pages
 │           └── more-nested-paths/
-│               ├── wrap-pages.js // ← wrapPages()
+│               ├── wrap-pages.js // ← wrapPages(<Provider>)
 │               ├── index.js
-│               ├── bar.js
-│               └── …
+│               └── … // more pages
 ├── package.json
 └── gatsby-config.json
 ```
@@ -25,14 +24,13 @@ Why? Everything is possible with vanilla Gatsby – what this Plugin offers, is 
 
 It supports:
 
-- TypeScript
-- Gatsby Themes and Plugins
-- Gatsby Plugins used as [Micro Frontends](https://www.youtube.com/watch?v=0Ta-awtLZTs)
 - SSR (SSG) and client-side rendering with the same wrapper
 - Wrap your pages with HTML Elements, React Components or Providers
 - Wrap pages in current directory
 - Wrap pages deep (nested)
 - Nested wrappers
+- Gatsby Themes and Plugins
+- Gatsby Plugins used as [Micro Frontends](#micro-frontends)
 - Programmatically created pages
 - Custom name of the wrapper file
 
@@ -130,6 +128,41 @@ exports.plugins = [
     },
   },
 ]
+```
+
+## Micro Frontends
+
+Gatsby can be used to build UX focused micro frontends, where everything is page based and optimized for a fantastic user and a11y experience – while still deliver micro frontend independence in terms of DX and dedicated developer teams.
+
+But the only piece missing is to easily customize what layout and what data provider is used by every micro application.
+
+Now, **gatsby-plugin-wrap-pages** can be included by every "mirco app" independently. They even can define what they want to call the wrapper files (`wrapperName`) by itself. Or if that matters, it can be used just by one micro app – even if the root application is not aware of this plugin.
+
+There is an [example setup](https://github.com/tujoworker/gatsby-plugin-wrap-pages/example-micro-frontends) in this repo.
+
+Example structure:
+
+```js
+micro-app-a/
+├── src/
+│   └── pages/
+│       └── micro-app-a/
+│           ├── wrap-pages.tsx // ← will wrap everything inside this directory
+│           ├── index.tsx
+│           └── … // more pages and nested routes
+micro-app-b/
+├── src/
+│   └── pages/
+│       └── micro-app-b/
+│           ├── wrap-pages.tsx // ← will wrap everything inside this directory
+│           ├── index.tsx
+│           └── … // more pages and nested routes
+main-application/
+├── src/
+│   └── pages/
+│       └── wrap-pages.tsx // ← wrapPagesDeep(<MainLayout>)
+├── package.json
+└── gatsby-config.json
 ```
 
 ## Programmatically created pages
