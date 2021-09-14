@@ -1,2 +1,0 @@
-(self.webpackChunk_micro_app_root_app=self.webpackChunk_micro_app_root_app||[]).push([[899],{4488:function(e,p,r){"use strict";r.r(p),r.d(p,{default:function(){return n}});var t=r(9703),a=r(7135);function n(e){return t.createElement("div",{style:{padding:"1rem"}},t.createElement("h1",null,"@micro-app/one"),t.createElement("p",null,"This page is wrapped with both the main wrapper and a wrapper inside this micro app."),t.createElement(a.rU,{to:"/"},"Go home"))}}}]);
-//# sourceMappingURL=component---micro-app-one-src-pages-one-index-tsx-46394ea6e81209b2b833.js.map
