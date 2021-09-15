@@ -6,7 +6,7 @@ But the only piece missing is to easily customize what layout and what data prov
 
 Now, **gatsby-plugin-wrap-pages** can be included by every "mirco app" independently. They even can define what they want to call the wrapper files (`wrapperName`) by itself. Or if that matters, it can be used just by one micro app – even if the root application is not aware of this plugin.
 
-Live [Demo](https://tujoworker.github.io/gatsby-plugin-wrap-pages/example-micro-frontends/) 🚀 provided by the [example code](https://github.com/tujoworker/gatsby-plugin-wrap-pages/tree/main/example-micro-frontends).
+Live [Demo](https://tujoworker.github.io/gatsby-plugin-wrap-pages/example-micro-frontends/) 🚀 provided by this ☝️ [example code](https://github.com/tujoworker/gatsby-plugin-wrap-pages/tree/main/example-micro-frontends).
 
 ## How it works
 
@@ -41,13 +41,14 @@ Think of pages more like a Native Mobile app – they contain the needed layout 
 ## The benefits of using Gatsby
 
 - Extremely stable and robust due to the fact that all the production builds are served as static files only (JAMStack). No server downtime and maintenance etc.
-- The fact that every page is rendered during release (SSG) will help dramatically to find render issues before they hit the user.
+- The fact that every page is rendered during release (SSR) will help dramatically to find render issues before they hit the user.
 - Incremental builds (build only new pages) by reusing the cache is a core feature of Gatsby.
-- Comprehensive automatic end-to-end (e2e) tests can be run in the same CI / CD process before / during main launch. This will make sure to test the functionality throughout the various apps - without any major work and complexity.
-- Apps can be run independently and in isolation or in combination as a whole in dev mode - locally without much setup / configuration.
-- Cab be easily versionized.
-  - The result: Good overview of all apps and its versions and its features and progress. More transparency in other words to everyone involved.
-  - Very easy to reverse to previous version since all apps / parts have a version history.
-- Sharing reusable code across apps is very easy.
 - Page preloading is provided "out of the box".
-- Building apps like that will resulting in an incredibly much better user experience. A page visit happens instantly.
+- Code-splitting per page basis.
+- Comprehensive automatic end-to-end (e2e) tests can be run in the same CI / CD process before / during main launch. This will make sure to test the functionality throughout the various applications - without any major work and complexity.
+- Apps can be run for development independently and in isolation or in combination as a whole.
+- Cab be easily versionized.
+  - The result: Good overview of all applications and its versions and its features and progress. More transparency in other words to everyone involved.
+  - Very easy to reverse to previous version since all applications / parts have a version history.
+- Sharing reusable code across applications is very easy.
+- Building applications like that will resulting in an incredibly much better user experience. A page visit happens instantly.

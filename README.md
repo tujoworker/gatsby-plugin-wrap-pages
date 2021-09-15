@@ -47,6 +47,7 @@ The parameters of that function are the same as Gatsby's API [`wrapPageElement`]
 - Add a wrapper function named `wrapPages`:
 
 ```jsx
+// Inside wrap-pages.js (or.tsx)
 export function wrapPages({ element }) {
   return <div>{element}</div>
 }
@@ -59,6 +60,7 @@ Pages in that specific directory will be wrapped with `<div>[current page]</div>
 - Add a function named `wrapPagesDeep`:
 
 ```jsx
+// Inside wrap-pages.js (or.tsx)
 export function wrapPagesDeep({ element }) {
   return <YourProvider>{element}</YourProvider>
 }
@@ -138,7 +140,7 @@ But the only piece missing is to easily customize what layout and what data prov
 
 Now, **gatsby-plugin-wrap-pages** can be included by every "mirco app" independently. They even can define what they want to call the wrapper files (`wrapperName`) by itself. Or if that matters, it can be used just by one micro app – even if the root application is not aware of this plugin.
 
-There is an [example setup](https://github.com/tujoworker/gatsby-plugin-wrap-pages/example-micro-frontends) in this repo.
+There is an [example setup](https://github.com/tujoworker/gatsby-plugin-wrap-pages/tree/main/example-micro-frontends) in this repo.
 
 Example structure:
 
@@ -160,7 +162,7 @@ micro-app-b/
 main-application/
 ├── src/
 │   └── pages/
-│       └── wrap-pages.tsx // ← wrapPagesDeep(<MainLayout>)
+│       └── main-layout.tsx // ← wrapPagesDeep(<MainLayout>)
 ├── package.json
 └── gatsby-config.json
 ```
