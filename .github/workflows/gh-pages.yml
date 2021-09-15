@@ -1,9 +1,11 @@
 name: GitHub Pages
 
 on:
-  push:
+  workflow_run:
+    workflows: ['Jest', 'Cypress']
     branches: [main]
-  pull_request:
+    types:
+      - completed
 
 jobs:
   deploy:

@@ -4,6 +4,7 @@ on:
   push:
     branches: [main, beta, chore/*, fix/*, ftr/*]
   pull_request:
+    types: [opened]
     branches: [main, beta]
 
 jobs:

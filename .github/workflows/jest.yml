@@ -16,6 +16,7 @@ jobs:
         node-version: [12.x, 14.x, 16.x]
 
     runs-on: ${{ matrix.platform }}
+    # if: github.event.pull_request.merged
 
     steps:
       - uses: actions/checkout@v2
