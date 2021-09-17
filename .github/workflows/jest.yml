@@ -1,4 +1,4 @@
-name: Jest
+name: Jest # NB: The name is used in workflow_run
 
 on:
   push:

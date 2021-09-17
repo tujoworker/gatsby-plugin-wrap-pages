@@ -1,4 +1,4 @@
-name: Cypress
+name: Cypress # NB: The name is used in workflow_run
 
 on:
   push:
