@@ -1,6 +1,0 @@
-{
-    "componentChunkName": "component---micro-app-home-src-pages-dynamic-page-[id]-index-tsx",
-    "path": "/dynamic-page/[id]/",
-    "result": {"pageContext":{"matchPath":"/dynamic-page/:id","WPS":[{"hash":"641f4a3990224f337a5eede79a03fcad","isSame":true},{"hash":"f5aa1e9c75b674123a4583d3df9990d1"},{"hash":"47d7bdb0096f0fcdd9afd36e5113c4cf"}]}},
-    "staticQueryHashes": [],
-    "matchPath": "/dynamic-page/:id"}

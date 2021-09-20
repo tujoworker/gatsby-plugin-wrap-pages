@@ -1,2 +1,0 @@
-(self.webpackChunk_micro_app_root_app=self.webpackChunk_micro_app_root_app||[]).push([[947],{3295:function(e,n,r){"use strict";r.r(n),r.d(n,{default:function(){return p}});var t=r(9703);function p(e){return t.createElement(t.Fragment,null,"404")}}}]);
-//# sourceMappingURL=component---micro-app-home-src-pages-404-tsx-e25880567fb5cdbddab4.js.map
