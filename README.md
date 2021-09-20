@@ -250,8 +250,8 @@ We also listen for `unlink` so we can update related pages when a wrapper gets d
 
 To test the add and remove cycle, run:
 
-1. $ `git checkout -- example-micro-frontends/micro-app-home/src/pages/home-layout.tsx`
+1. $ `unlink example-micro-frontends/micro-app-home/src/pages/home-layout.tsx`
 
-2. $ `unlink example-micro-frontends/micro-app-home/src/pages/home-layout.tsx`
+2. $ `git checkout -- example-micro-frontends/micro-app-home/src/pages/home-layout.tsx`
 
 3. And repeat. Eventually refresh the browser.
