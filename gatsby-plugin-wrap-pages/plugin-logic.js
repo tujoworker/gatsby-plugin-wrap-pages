@@ -1,6 +1,7 @@
 const systemPath = require('path')
 const fs = require('fs-extra')
-const { createContentDigest } = require('gatsby-core-utils')
+const { createContentDigest, slash } = require('gatsby-core-utils')
+const reporter = require('gatsby-cli/lib/reporter')
 const {
   pageDataExists,
   writePageData,
@@ -18,7 +19,6 @@ globalThis.WPScopeFilesHash = null
 // Export all so we also can mock them
 exports.handleWrapperScopesAndPages = handleWrapperScopesAndPages
 exports.isWrapper = isWrapper
-exports.convertToForwardslash = convertToForwardslash
 exports.DEFAULT_WRAPPER_NAME = DEFAULT_WRAPPER_NAME
 
 async function handleWrapperScopesAndPages(params) {
@@ -47,7 +47,7 @@ async function collectWrappers({
       page.scopeData = page.scopeData || {}
 
       const componentPath = getPageComponent(page)
-      const relativePath = convertToForwardslash(
+      const relativePath = slash(
         systemPath.relative(globalThis.WPProgramDirectory, componentPath)
       )
 
@@ -87,7 +87,7 @@ async function updateContextInPages({
 
     const dirPath = systemPath.dirname(componentPath)
 
-    const relativeDirectoryPath = convertToForwardslash(
+    const relativeDirectoryPath = slash(
       systemPath.relative(globalThis.WPProgramDirectory, dirPath)
     )
     const correctedDirectoryPath = correctRelativePath(
@@ -127,28 +127,40 @@ async function updateContextInPages({
         )
 
         if (pageDataExists(publicDir, page.path)) {
-          // 1. Read page context
-          const result = JSON.parse(
-            await readPageQueryResult(publicDir, page.path)
+          const pageQueryResult = await readPageQueryResult(
+            publicDir,
+            page.path
           )
 
-          // 2. Update the page context
-          result.pageContext.WPS = page.context.WPS
+          if (pageQueryResult) {
+            console.log('pageQueryResult', String(pageQueryResult))
 
-          // 3. write the page context to the cache
-          await savePageQueryResult(
-            globalThis.WPProgramDirectory,
-            page.path,
-            JSON.stringify(result)
-          )
+            try {
+              // 1. Read page context
+              const result = JSON.parse(pageQueryResult)
+              console.log('result', result)
 
-          // Ensure the page has at least an empty staticQueryHashes array
-          if (!page.staticQueryHashes) {
-            page.staticQueryHashes = []
+              // 2. Update the page context
+              result.pageContext.WPS = page.context.WPS
+
+              // 3. write the page context to the cache
+              await savePageQueryResult(
+                globalThis.WPProgramDirectory,
+                page.path,
+                JSON.stringify(result)
+              )
+
+              // Ensure the page has at least an empty staticQueryHashes array
+              if (!page.staticQueryHashes) {
+                page.staticQueryHashes = []
+              }
+
+              // 4. update the real page context data for the effected page
+              await writePageData(publicDir, page)
+            } catch (e) {
+              reporter.error(e)
+            }
           }
-
-          // 4. update the real page context data for the effected page
-          await writePageData(publicDir, page)
         }
       }
     }
@@ -244,13 +256,6 @@ function isWrapper({ page, wrapperName = null }) {
   })
 }
 
-function convertToForwardslash(path) {
-  if (path.includes('\\')) {
-    return path.replace(/\\/g, '/')
-  }
-  return path
-}
-
 function correctRelativePath(path) {
   if (path.startsWith('../')) {
     return path.substr(path.indexOf('/src/') + 1)
@@ -263,7 +268,7 @@ function getPageComponent(page) {
 
   // Handle createPage context
   if (page.context && page.context.wrapPageWith) {
-    componentPath = convertToForwardslash(
+    componentPath = slash(
       systemPath.resolve(
         systemPath.isAbsolute(page.context.wrapPageWith)
           ? '/'

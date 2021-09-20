@@ -1,9 +1,7 @@
 import systemPath from 'path'
 import fs from 'fs-extra'
-import {
-  handleWrapperScopesAndPages,
-  convertToForwardslash,
-} from 'gatsby-plugin-wrap-pages/plugin-logic'
+const { slash } = require('gatsby-core-utils')
+import { handleWrapperScopesAndPages } from 'gatsby-plugin-wrap-pages/plugin-logic'
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -26,7 +24,7 @@ const getPage = (component = 'src/pages/index.js', merge = null) => [
   'path',
   {
     path: '/path',
-    component: convertToForwardslash(
+    component: slash(
       systemPath.resolve(globalThis.WPProgramDirectory, component)
     ),
     context: {},
@@ -59,7 +57,7 @@ describe('wrapper', () => {
     await handleWrapperScopesAndPages(
       getParams({
         pages,
-        filterFile: convertToForwardslash(
+        filterFile: slash(
           systemPath.resolve(
             globalThis.WPProgramDirectory,
             'src/pages/wrap-pages.js'
@@ -125,7 +123,7 @@ describe('wrapper', () => {
     await handleWrapperScopesAndPages(
       getParams({
         pages,
-        filterFile: convertToForwardslash(
+        filterFile: slash(
           systemPath.resolve(
             globalThis.WPProgramDirectory,
             'src/pages/wrap-pages.js'
@@ -164,7 +162,7 @@ describe('wrapper', () => {
     await handleWrapperScopesAndPages(
       getParams({
         pages,
-        filterDir: convertToForwardslash(
+        filterDir: slash(
           systemPath.dirname(
             globalThis.WPProgramDirectory,
             'src/pages/wrap-pages'
@@ -456,10 +454,10 @@ export * as _de24c938e6d0ae34eea46b0360bc707c from '../src/pages/wrap-pages.js';
   })
 })
 
-describe('convertToForwardslash', () => {
+describe('slash', () => {
   it('should flip backslashes', async () => {
     const path = 'path-a\\path-b\\path-c'
-    const fixedPath = convertToForwardslash(path)
+    const fixedPath = slash(path)
 
     expect(fixedPath).toBe('path-a/path-b/path-c')
   })

@@ -2,6 +2,7 @@ const systemPath = require('path')
 const chokidar = require('chokidar')
 const chalk = require('chalk')
 const onExit = require('signal-exit')
+const { slash } = require('gatsby-core-utils')
 const {
   handleWrapperScopesAndPages,
   isWrapper,
@@ -91,7 +92,7 @@ exports.onPostBootstrap = async (
 }
 
 exports.onCreateDevServer = (
-  { reporter, store, actions },
+  { reporter, store, actions, emitter },
   pluginOptions
 ) => {
   let updateTimeout = null
@@ -147,22 +148,22 @@ exports.onCreateDevServer = (
     )
   })
 
-  const watcher = chokidar.watch(watchPaths, { ignoreInitial: true })
-
-  watcher.on('add', (path) => {
-    const filterFile = path
-    const page = { component: filterFile }
+  emitter.on('CREATE_PAGE', async (action) => {
+    const filterFile = slash(action.payload.component)
 
     // 1. check first if the new file is a wrapper
+    const page = { component: filterFile }
     if (isWrapper({ page, wrapperName: globalThis.WPWrapperNames })) {
       // 2. we will then filter against directories
       const filterDir = systemPath.dirname(filterFile)
-      updatePages({ filterDir })
+      await updatePages({ filterDir })
     } else {
       // 3. instead of pages
-      updatePages({ filterFile })
+      await updatePages({ filterFile })
     }
   })
+
+  const watcher = chokidar.watch(watchPaths, { ignoreInitial: true })
 
   watcher.on('unlink', (path) => {
     const filterDir = systemPath.dirname(path)
